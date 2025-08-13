@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Buddy – Prototype</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="logo">🏋️</span>
+        <span class="title">Gym Buddy</span>
+      </div>
+      <nav class="tabs">
+        <button data-route="home" class="tab-btn active">Accueil</button>
+        <button data-route="search" class="tab-btn">Recherche</button>
+        <button data-route="chat" class="tab-btn">Chat</button>
+        <button data-route="profile" class="tab-btn">Profil</button>
+      </nav>
+    </header>
+
+    <main id="view-root" class="view-root">
+      <!-- Views will be injected here by app.js -->
+    </main>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
