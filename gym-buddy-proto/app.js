@@ -92,31 +92,53 @@ function setupGeoCascade(prefix, { initial = {}, onChange } = {}) {
   const regionSel = document.getElementById(`${prefix}-region`);
   const deptSel = document.getElementById(`${prefix}-dept`);
   const citySel = document.getElementById(`${prefix}-city`);
+  const regionSearch = document.getElementById(`${prefix}-region-search`);
+  const deptSearch = document.getElementById(`${prefix}-dept-search`);
+  const citySearch = document.getElementById(`${prefix}-city-search`);
   if (!regionSel || !deptSel || !citySel) return;
-  // Regions
+
+  let regionsList = [];
+  let depsList = [];
+  let citiesList = [];
+
+  const renderRegions = () => {
+    const q = normalizeText(regionSearch?.value || '');
+    const arr = q ? regionsList.filter(r => normalizeText(`${r.name} ${r.code}`).includes(q)) : regionsList;
+    regionSel.innerHTML = `<option value="">Région</option>` + arr.map(r=>`<option value="${r.code}">${r.name}</option>`).join('');
+    if (initial.regionCode && arr.some(r=>r.code===initial.regionCode)) regionSel.value = initial.regionCode;
+  };
+  const renderDepts = () => {
+    const q = normalizeText(deptSearch?.value || '');
+    const arr = q ? depsList.filter(d => normalizeText(`${d.name} ${d.code}`).includes(q)) : depsList;
+    deptSel.innerHTML = `<option value="">Département</option>` + arr.map(d=>`<option value="${d.code}">${d.name}</option>`).join('');
+    deptSel.disabled = !(regionSel.value);
+    if (initial.departmentCode && arr.some(d=>d.code===initial.departmentCode)) deptSel.value = initial.departmentCode;
+  };
+  const renderCities = () => {
+    const q = normalizeText(citySearch?.value || '');
+    const arr = q ? citiesList.filter(c => normalizeText(c).includes(q)) : citiesList;
+    citySel.innerHTML = `<option value="">Ville</option>` + arr.map(c=>`<option value="${c}">${c}</option>`).join('');
+    citySel.disabled = !(deptSel.value) || arr.length===0;
+    if (initial.city && arr.includes(initial.city)) citySel.value = initial.city;
+    if (typeof onChange === 'function') onChange();
+  };
+
   fetchRegions().then(regions => {
-    regionSel.innerHTML = `<option value="">Région</option>` + regions.map(r=>`<option value="${r.code}">${r.name}</option>`).join('');
-    if (initial.regionCode) regionSel.value = initial.regionCode;
+    regionsList = regions;
+    renderRegions();
     const loadDepts = () => {
       const rc = regionSel.value;
-      fetchDepartments(rc).then(deps => {
-        deptSel.innerHTML = `<option value="">Département</option>` + deps.map(d=>`<option value="${d.code}">${d.name}</option>`).join('');
-        deptSel.disabled = !rc;
-        if (initial.departmentCode && deps.some(d=>d.code===initial.departmentCode)) deptSel.value = initial.departmentCode;
-        loadCities();
-      });
+      fetchDepartments(rc).then(deps => { depsList = deps; renderDepts(); loadCities(); });
     };
     const loadCities = () => {
       const dc = deptSel.value;
-      fetchCities(dc).then(cities => {
-        citySel.innerHTML = `<option value="">Ville</option>` + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
-        citySel.disabled = !dc || cities.length===0;
-        if (initial.city && cities.includes(initial.city)) citySel.value = initial.city;
-        if (typeof onChange === 'function') onChange();
-      });
+      fetchCities(dc).then(cities => { citiesList = cities; renderCities(); });
     };
     regionSel.addEventListener('change', () => { initial.departmentCode = null; initial.city = null; loadDepts(); });
     deptSel.addEventListener('change', () => { initial.city = null; loadCities(); });
+    regionSearch?.addEventListener('input', renderRegions);
+    deptSearch?.addEventListener('input', renderDepts);
+    citySearch?.addEventListener('input', renderCities);
     loadDepts();
   });
 }
@@ -529,14 +551,17 @@ function renderOnboarding() {
           </div>
           <div>
             <label>Région</label>
+            <input id="onb-region-search" class="input" placeholder="Rechercher une région" />
             <select id="onb-region" class="input"></select>
           </div>
           <div>
             <label>Département</label>
+            <input id="onb-dept-search" class="input" placeholder="Rechercher un département" />
             <select id="onb-dept" class="input"></select>
           </div>
           <div>
             <label>Ville</label>
+            <input id="onb-city-search" class="input" placeholder="Rechercher une ville" />
             <select id="onb-city" class="input"></select>
           </div>
           <div style="grid-column: 1 / -1">
@@ -758,14 +783,17 @@ function renderSearch() {
           </div>
           <div>
             <label>Région</label>
+            <input id="f-region-search" class="input" placeholder="Rechercher une région" />
             <select id="f-region" class="input"></select>
           </div>
           <div>
             <label>Département</label>
+            <input id="f-dept-search" class="input" placeholder="Rechercher un département" />
             <select id="f-dept" class="input"></select>
           </div>
           <div>
             <label>Ville</label>
+            <input id="f-city-search" class="input" placeholder="Rechercher une ville" />
             <select id="f-city" class="input"></select>
           </div>
         </div>
@@ -976,10 +1004,17 @@ function renderProfile() {
         <div>
           <label>Localisation</label>
           <div class="grid cols-2">
-            <select id="me-region" class="input"></select>
-            <select id="me-dept" class="input"></select>
+            <div>
+              <input id="me-region-search" class="input" placeholder="Rechercher une région" />
+              <select id="me-region" class="input"></select>
+            </div>
+            <div>
+              <input id="me-dept-search" class="input" placeholder="Rechercher un département" />
+              <select id="me-dept" class="input"></select>
+            </div>
           </div>
           <div style="margin-top:8px">
+            <input id="me-city-search" class="input" placeholder="Rechercher une ville" />
             <select id="me-city" class="input"></select>
           </div>
         </div>
@@ -1006,7 +1041,7 @@ function renderProfile() {
   // Toggle edit mode
   document.getElementById('toggle-edit').onclick = () => { state.ui.profileEdit = !edit; saveState(); renderProfile(); };
   // Disable/enable fields based on edit mode
-  const ids = ['me-name','me-birth','me-photo-file','me-photo-url','apply-photo-url','me-region','me-dept','me-city','me-chain','me-gym','me-bio'];
+  const ids = ['me-name','me-birth','me-photo-file','me-photo-url','apply-photo-url','me-region','me-dept','me-city','me-chain','me-gym','me-bio','me-region-search','me-dept-search','me-city-search'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = !edit; });
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;

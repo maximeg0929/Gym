@@ -128,3 +128,16 @@ label { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 6
   .choices { grid-template-columns: repeat(4, 1fr); }
   .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Mobile-first tweaks */
+@media (max-width: 480px) {
+  .view-root { padding: 12px; padding-bottom: 84px; }
+  .h1 { font-size: 20px; }
+  .card { border-radius: 14px; padding: 12px; }
+  .btn { padding: 12px 14px; border-radius: 12px; }
+  .grid.cols-2 { grid-template-columns: 1fr; }
+  .grid.cols-3 { grid-template-columns: 1fr; }
+  .match-photo { height: 220px; }
+  .messages { height: 300px; }
+  .bottom-nav .tab-btn { font-size: 24px; padding: 12px 0; }
+}
