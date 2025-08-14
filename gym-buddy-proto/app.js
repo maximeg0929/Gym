@@ -286,6 +286,7 @@ function seed() {
     regionCode: "IDF",
     departmentCode: "75",
     city: "Paris",
+    birthDate: "1995-01-01",
   };
   return {
     ...structuredClone(defaultState),
@@ -334,6 +335,7 @@ function generateDemoUsers(gyms) {
       regionCode: loc.regionCode,
       departmentCode: loc.departmentCode,
       city: loc.city,
+      birthDate: randomBirthDateISO(),
     };
   });
 }
@@ -350,6 +352,29 @@ function genBio(level) {
 
 function sample(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randomBetween(min, max) { return Math.random() * (max - min) + min; }
+function randomBirthDateISO(minAge = 18, maxAge = 55) {
+  const now = new Date();
+  const age = Math.floor(randomBetween(minAge, maxAge + 1));
+  const year = now.getFullYear() - age;
+  const month = Math.floor(Math.random() * 12);
+  const day = Math.floor(Math.random() * 28) + 1;
+  const d = new Date(year, month, day);
+  return d.toISOString().slice(0, 10);
+}
+function calculateAge(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - d.getFullYear();
+  const m = today.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+  return age >= 0 && age < 130 ? age : null;
+}
+function ageLabel(user) {
+  const a = calculateAge(user?.birthDate);
+  return a != null ? `${a} ans` : "Âge —";
+}
 
 // Availability bitmask helpers (7 days x 48 half-hours = 336 bits)
 function generateRandomWeekMask(fillRatio = 0.3) {
@@ -476,6 +501,11 @@ function renderOnboarding() {
         <input id="name" class="input" placeholder="Votre prénom" value="${me?.name ?? ''}" />
       </div>
       <div>
+        <label>Date de naissance</label>
+        <input id="onb-birth" type="date" class="input" value="${me?.birthDate ? me.birthDate.slice(0,10) : ''}" />
+        <div class="muted" id="onb-age" style="margin-top:6px">${ageLabel(me)}</div>
+      </div>
+      <div>
         <label>Niveau</label>
         <div class="choices" id="level-choices">
           ${levels.map((l,i)=>`<div data-val="${i}" class="choice ${me?.level===i?'active':''}">${l}</div>`).join('')}
@@ -523,7 +553,11 @@ function renderOnboarding() {
   `;
 
   setupGymCascade('onb', { multipleGyms: true, initial: { chainId: '', regionCode: me?.regionCode, departmentCode: me?.departmentCode, city: me?.city, gymIds: me?.favorites || [] } });
-
+  document.getElementById('onb-birth').addEventListener('change', (e)=>{
+    const iso = e.target.value;
+    const a = calculateAge(iso);
+    document.getElementById('onb-age').textContent = a!=null? `${a} ans` : 'Âge —';
+  });
   document.getElementById('level-choices').addEventListener('click', (e) => {
     const item = e.target.closest('.choice'); if (!item) return;
     document.querySelectorAll('#level-choices .choice').forEach(c=>c.classList.remove('active'));
@@ -536,6 +570,7 @@ function renderOnboarding() {
   });
   document.getElementById('save-onboarding').addEventListener('click', () => {
     const name = document.getElementById('name').value.trim() || 'Moi';
+    const birthDate = document.getElementById('onb-birth').value || null;
     const level = parseInt(document.querySelector('#level-choices .choice.active')?.dataset.val ?? '1');
     const goal = document.querySelector('#goal-choices .choice.active')?.dataset.val ?? 'Hypertrophie';
     const favorites = Array.from(document.getElementById('onb-gym').selectedOptions).map(o=>o.value);
@@ -543,7 +578,7 @@ function renderOnboarding() {
     const regionCode = document.getElementById('onb-region').value || null;
     const departmentCode = document.getElementById('onb-dept').value || null;
     const city = document.getElementById('onb-city').value || null;
-    state.me = { ...state.me, name, level, goal, favorites, bio, regionCode, departmentCode, city };
+    state.me = { ...state.me, name, birthDate, level, goal, favorites, bio, regionCode, departmentCode, city };
     syncAccountWithMe();
     saveState();
     showToast('Profil enregistré');
@@ -614,7 +649,7 @@ function renderList(recos) {
               <div style="font-weight:700">${r.user.name}</div>
               <div class="badge">${(r.score*100).toFixed(0)}%</div>
             </div>
-            <div class="muted" style="margin-top:4px">${levelLabel(r.user.level)} • ${r.user.goal} • ${r.user.city || ''}</div>
+            <div class="muted" style="margin-top:4px">${levelLabel(r.user.level)} • ${r.user.goal} • ${r.user.city || ''} • ${ageLabel(r.user)}</div>
             <div class="pills" style="margin-top:6px">${r.user.favorites.map(fid => gymPill(fid)).join('')}</div>
           </div>
           <div class="grid">
@@ -631,7 +666,7 @@ function levelLabel(level) { return ["Débutant","Intermédiaire","Avancé","Com
 function gymPill(gymId) { const g = state.gyms.find(x => x.id === gymId); if (!g) return ''; return `<span class="badge">${g.name.split(' ')[0]} • ${g.city}</span>`; }
 
 function matchCardHTML(user, score) {
-  const pills = [`<span class=\"badge\">${levelLabel(user.level)}</span>`, `<span class=\"badge\">${user.goal}</span>`, ...user.favorites.map(fid => gymPill(fid))].join('');
+  const pills = [`<span class=\"badge\">${levelLabel(user.level)}</span>`, `<span class=\"badge\">${user.goal}</span>`, `<span class=\"badge\">${ageLabel(user)}</span>`, ...user.favorites.map(fid => gymPill(fid))].join('');
   return `
     <div class="match-card">
       <img class="match-photo" src="${user.photoUrl}" alt="${user.name}" />
@@ -657,7 +692,7 @@ function openProfileModal(user) {
         <button class="btn" id="close-modal">Fermer</button>
       </div>
       <img class="match-photo" src="${user.photoUrl}" />
-      <div class="pills" style="margin-top:8px">${[ `<span class='badge'>${levelLabel(user.level)}</span>`, `<span class='badge'>${user.goal}</span>`, ...user.favorites.map(gymPill) ].join('')}</div>
+      <div class="pills" style="margin-top:8px">${[ `<span class='badge'>${levelLabel(user.level)}</span>`, `<span class='badge'>${user.goal}</span>`, `<span class='badge'>${ageLabel(user)}</span>`, ...user.favorites.map(gymPill) ].join('')}</div>
       <div class="section">
         <div class="h2">Bio</div>
         <div class="muted">${user.bio}</div>
@@ -888,7 +923,7 @@ function downloadICS({ title, description, location, start, end }) {
 
 function renderProfile() {
   const me = state.me;
-  const pills = [ `<span class="badge">${levelLabel(me.level)}</span>`, `<span class="badge">${me.goal}</span>`, ...me.favorites.map(gymPill) ].join('');
+  const pills = [ `<span class="badge">${levelLabel(me.level)}</span>`, `<span class="badge">${me.goal}</span>`, `<span class="badge">${ageLabel(me)}</span>`, ...me.favorites.map(gymPill) ].join('');
   viewRoot().innerHTML = `
     <div class="section h1">Mon profil</div>
     <div class="card grid cols-2">
@@ -896,7 +931,10 @@ function renderProfile() {
         <img class="match-photo" src="${me.photoUrl}" alt="Moi" />
         <div class="row space-between" style="margin-top:6px">
           <div style="font-weight:800; font-size:18px">${me.name}</div>
-          <div class="badge">${levelLabel(me.level)}</div>
+          <div class="row" style="gap:8px">
+            <div class="badge">${levelLabel(me.level)}</div>
+            <div class="badge">${ageLabel(me)}</div>
+          </div>
         </div>
         <div class="pills">${pills}</div>
       </div>
@@ -904,6 +942,10 @@ function renderProfile() {
         <div>
           <label>Nom</label>
           <input id="me-name" class="input" value="${me.name}" />
+        </div>
+        <div>
+          <label>Date de naissance</label>
+          <input id="me-birth" type="date" class="input" value="${me.birthDate ? me.birthDate.slice(0,10) : ''}" />
         </div>
         <div>
           <label>Photo de profil</label>
@@ -944,10 +986,10 @@ function renderProfile() {
       </div>
     </div>
   `;
-  // Use unified cascade
   setupGymCascade('me', { multipleGyms: true, initial: { regionCode: me.regionCode, departmentCode: me.departmentCode, city: me.city, gymIds: me.favorites } });
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;
+    state.me.birthDate = document.getElementById('me-birth').value || null;
     state.me.bio = document.getElementById('me-bio').value.trim();
     state.me.regionCode = document.getElementById('me-region').value || null;
     state.me.departmentCode = document.getElementById('me-dept').value || null;
@@ -991,6 +1033,7 @@ function renderAuth() {
           <div><label>Prénom</label><input id="su-name" class="input" placeholder="Votre prénom" /></div>
           <div><label>Email</label><input id="su-email" class="input" type="email" placeholder="vous@example.com" /></div>
           <div><label>Mot de passe</label><input id="su-pass" class="input" type="password" placeholder="Mot de passe" /></div>
+          <div><label>Date de naissance</label><input id="su-birth" type="date" class="input" /></div>
           <div>
             <label>Localisation</label>
             <div class="grid cols-2">
@@ -1009,5 +1052,5 @@ function renderAuth() {
   loginTab.onclick = showLogin; signupTab.onclick = showSignup; showLogin();
   setupRegionDept('su-region', 'su-dept', '', '');
   document.getElementById('btn-login').onclick = () => { const email = document.getElementById('login-email').value.trim().toLowerCase(); const pass = document.getElementById('login-pass').value; const acct = state.accounts.find(a => (a.email||'').toLowerCase() === email && a.password === pass); if (!acct) { showToast('Identifiants invalides'); return; } setLoggedInUserById(acct.id); showToast('Connecté'); setRoute('home'); };
-  document.getElementById('btn-signup').onclick = () => { const name = document.getElementById('su-name').value.trim(); const email = document.getElementById('su-email').value.trim().toLowerCase(); const pass = document.getElementById('su-pass').value; const regionCode = document.getElementById('su-region').value || null; const departmentCode = document.getElementById('su-dept').value || null; if (!name || !email || !pass) { showToast('Complétez tous les champs'); return; } if (state.accounts.some(a => (a.email||'').toLowerCase() === email)) { showToast('Email déjà utilisé'); return; } const id = `acc_${Date.now()}`; const account = { id, name, email, password: pass, photoUrl: avatar(name), level: 1, goal: 'Hypertrophie', favorites: [], availabilityMask: generateRandomWeekMask(0.3), bio: '', regionCode, departmentCode, city: null }; state.accounts.push(account); state.me = { ...account }; state.auth = { currentUserId: id }; saveState(); showToast('Compte créé'); setRoute('onboarding'); };
+  document.getElementById('btn-signup').onclick = () => { const name = document.getElementById('su-name').value.trim(); const email = document.getElementById('su-email').value.trim().toLowerCase(); const pass = document.getElementById('su-pass').value; const birthDate = document.getElementById('su-birth').value || null; const regionCode = document.getElementById('su-region').value || null; const departmentCode = document.getElementById('su-dept').value || null; if (!name || !email || !pass) { showToast('Complétez tous les champs'); return; } if (state.accounts.some(a => (a.email||'').toLowerCase() === email)) { showToast('Email déjà utilisé'); return; } const id = `acc_${Date.now()}`; const account = { id, name, email, password: pass, photoUrl: avatar(name), level: 1, goal: 'Hypertrophie', favorites: [], availabilityMask: generateRandomWeekMask(0.3), bio: '', regionCode, departmentCode, city: null, birthDate }; state.accounts.push(account); state.me = { ...account }; state.auth = { currentUserId: id }; saveState(); showToast('Compte créé'); setRoute('onboarding'); };
 }
