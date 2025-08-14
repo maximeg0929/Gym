@@ -25,6 +25,59 @@ const defaultState = {
   auth: { currentUserId: null },
 };
 
+// FR regions & departments (subset representative + common ones)
+const FR_REGIONS = [
+  { code: "IDF", name: "Île-de-France" },
+  { code: "ARA", name: "Auvergne-Rhône-Alpes" },
+  { code: "PAC", name: "Provence-Alpes-Côte d'Azur" },
+  { code: "NAQ", name: "Nouvelle-Aquitaine" },
+  { code: "OCC", name: "Occitanie" },
+  { code: "HDF", name: "Hauts-de-France" },
+  { code: "GE", name: "Grand Est" },
+  { code: "PL", name: "Pays de la Loire" },
+  { code: "BRE", name: "Bretagne" },
+  { code: "BFC", name: "Bourgogne-Franche-Comté" },
+  { code: "CVL", name: "Centre-Val de Loire" },
+  { code: "NOR", name: "Normandie" },
+  { code: "COR", name: "Corse" },
+];
+const FR_DEPARTMENTS = {
+  IDF: [
+    { code: "75", name: "Paris" }, { code: "77", name: "Seine-et-Marne" }, { code: "78", name: "Yvelines" },
+    { code: "91", name: "Essonne" }, { code: "92", name: "Hauts-de-Seine" }, { code: "93", name: "Seine-Saint-Denis" },
+    { code: "94", name: "Val-de-Marne" }, { code: "95", name: "Val-d'Oise" },
+  ],
+  ARA: [ { code: "01", name: "Ain" }, { code: "07", name: "Ardèche" }, { code: "26", name: "Drôme" }, { code: "38", name: "Isère" }, { code: "42", name: "Loire" }, { code: "43", name: "Haute-Loire" }, { code: "63", name: "Puy-de-Dôme" }, { code: "69", name: "Rhône" }, { code: "73", name: "Savoie" }, { code: "74", name: "Haute-Savoie" } ],
+  PAC: [ { code: "04", name: "Alpes-de-Haute-Provence" }, { code: "05", name: "Hautes-Alpes" }, { code: "06", name: "Alpes-Maritimes" }, { code: "13", name: "Bouches-du-Rhône" }, { code: "83", name: "Var" }, { code: "84", name: "Vaucluse" } ],
+  NAQ: [ { code: "16", name: "Charente" }, { code: "17", name: "Charente-Maritime" }, { code: "19", name: "Corrèze" }, { code: "23", name: "Creuse" }, { code: "24", name: "Dordogne" }, { code: "33", name: "Gironde" }, { code: "40", name: "Landes" }, { code: "47", name: "Lot-et-Garonne" }, { code: "64", name: "Pyrénées-Atlantiques" }, { code: "79", name: "Deux-Sèvres" }, { code: "86", name: "Vienne" }, { code: "87", name: "Haute-Vienne" } ],
+  OCC: [ { code: "09", name: "Ariège" }, { code: "11", name: "Aude" }, { code: "12", name: "Aveyron" }, { code: "30", name: "Gard" }, { code: "31", name: "Haute-Garonne" }, { code: "32", name: "Gers" }, { code: "34", name: "Hérault" }, { code: "46", name: "Lot" }, { code: "48", name: "Lozère" }, { code: "65", name: "Hautes-Pyrénées" }, { code: "66", name: "Pyrénées-Orientales" }, { code: "81", name: "Tarn" }, { code: "82", name: "Tarn-et-Garonne" } ],
+  HDF: [ { code: "02", name: "Aisne" }, { code: "59", name: "Nord" }, { code: "60", name: "Oise" }, { code: "62", name: "Pas-de-Calais" }, { code: "80", name: "Somme" } ],
+  GE:  [ { code: "08", name: "Ardennes" }, { code: "10", name: "Aube" }, { code: "51", name: "Marne" }, { code: "52", name: "Haute-Marne" }, { code: "54", name: "Meurthe-et-Moselle" }, { code: "55", name: "Meuse" }, { code: "57", name: "Moselle" }, { code: "67", name: "Bas-Rhin" }, { code: "68", name: "Haut-Rhin" }, { code: "88", name: "Vosges" } ],
+  PL:  [ { code: "44", name: "Loire-Atlantique" }, { code: "49", name: "Maine-et-Loire" }, { code: "53", name: "Mayenne" }, { code: "72", name: "Sarthe" }, { code: "85", name: "Vendée" } ],
+  BRE: [ { code: "22", name: "Côtes-d'Armor" }, { code: "29", name: "Finistère" }, { code: "35", name: "Ille-et-Vilaine" }, { code: "56", name: "Morbihan" } ],
+  BFC: [ { code: "21", name: "Côte-d'Or" }, { code: "25", name: "Doubs" }, { code: "39", name: "Jura" }, { code: "58", name: "Nièvre" }, { code: "70", name: "Haute-Saône" }, { code: "71", name: "Saône-et-Loire" }, { code: "89", name: "Yonne" }, { code: "90", name: "Territoire de Belfort" } ],
+  CVL: [ { code: "18", name: "Cher" }, { code: "28", name: "Eure-et-Loir" }, { code: "36", name: "Indre" }, { code: "37", name: "Indre-et-Loire" }, { code: "41", name: "Loir-et-Cher" }, { code: "45", name: "Loiret" } ],
+  NOR: [ { code: "14", name: "Calvados" }, { code: "27", name: "Eure" }, { code: "50", name: "Manche" }, { code: "61", name: "Orne" }, { code: "76", name: "Seine-Maritime" } ],
+  COR: [ { code: "2A", name: "Corse-du-Sud" }, { code: "2B", name: "Haute-Corse" } ],
+};
+
+function setupRegionDept(regionSelectId, deptSelectId, initialRegion, initialDept) {
+  const rSel = document.getElementById(regionSelectId);
+  const dSel = document.getElementById(deptSelectId);
+  if (!rSel || !dSel) return;
+  rSel.innerHTML = `<option value="">Région</option>` + FR_REGIONS.map(r=>`<option value="${r.code}">${r.name}</option>`).join('');
+  if (initialRegion) rSel.value = initialRegion;
+  const refreshDepts = () => {
+    const code = rSel.value;
+    const list = FR_DEPARTMENTS[code] || [];
+    dSel.innerHTML = `<option value="">Département</option>` + list.map(d=>`<option value="${d.code}">${d.name}</option>`).join('');
+    dSel.disabled = !code;
+    if (initialDept && code && list.some(d=>d.code===initialDept)) dSel.value = initialDept;
+  };
+  rSel.addEventListener('change', () => { initialDept = null; refreshDepts(); });
+  refreshDepts();
+}
+
 let state = loadState();
 if (!state || !state.gyms?.length) {
   state = seed();
@@ -93,6 +146,8 @@ function seed() {
     availabilityMask: generateRandomWeekMask(0.35),
     bio: "Motivé pour progresser en force et hypertrophie. Bench day addict.",
     email: "alex@example.com",
+    regionCode: "IDF",
+    departmentCode: "75",
   };
   return {
     ...structuredClone(defaultState),
@@ -113,6 +168,12 @@ function avatar(name) {
   return `https://api.dicebear.com/7.x/thumbs/svg?seed=${seed}`;
 }
 
+function randomRegionDept() {
+  const region = sample(FR_REGIONS);
+  const dept = sample(FR_DEPARTMENTS[region.code] || [{ code: "75", name: "Paris" }]);
+  return { regionCode: region.code, departmentCode: dept.code };
+}
+
 function generateDemoUsers(gyms) {
   const names = [
     "Léa", "Maxime", "Sofia", "Yann", "Camille", "Nina", "Rayan", "Eva", "Mehdi", "Zoé",
@@ -123,6 +184,7 @@ function generateDemoUsers(gyms) {
     const level = Math.floor(Math.random() * 4);
     const favorites = [sample(gyms).id];
     if (Math.random() > 0.6) favorites.push(sample(gyms).id);
+    const { regionCode, departmentCode } = randomRegionDept();
     return {
       id: "u_" + idx,
       name: n,
@@ -132,6 +194,8 @@ function generateDemoUsers(gyms) {
       favorites: Array.from(new Set(favorites)),
       availabilityMask: generateRandomWeekMask(randomBetween(0.2, 0.6)),
       bio: genBio(level),
+      regionCode,
+      departmentCode,
     };
   });
   return users;
@@ -196,8 +260,6 @@ function gymScore(userA, userB) {
   const gyms = state.gyms;
   const favoritesA = userA.favorites.map(id => gyms.find(g => g.id === id));
   const favoritesB = userB.favorites.map(id => gyms.find(g => g.id === id));
-  const chainIdsA = new Set(favoritesA.filter(Boolean).map(g => g.chainId));
-  const chainIdsB = new Set(favoritesB.filter(Boolean).map(g => g.chainId));
   let best = 0;
   for (const ga of favoritesA) {
     for (const gb of favoritesB) {
@@ -295,6 +357,13 @@ function renderOnboarding() {
         </div>
       </div>
       <div>
+        <label>Région / Département</label>
+        <div class="grid cols-2">
+          <select id="onb-region" class="input"></select>
+          <select id="onb-dept" class="input"></select>
+        </div>
+      </div>
+      <div>
         <label>Salle(s) favorites</label>
         <select id="gym-select" class="input" multiple size="5">
           ${gyms.map(g=>`<option value="${g.id}" ${me?.favorites?.includes(g.id)?'selected':''}>${g.name} — ${g.city}</option>`).join('')}
@@ -314,6 +383,8 @@ function renderOnboarding() {
     </div>
   `;
 
+  setupRegionDept('onb-region', 'onb-dept', me?.regionCode, me?.departmentCode);
+
   document.getElementById('level-choices').addEventListener('click', (e) => {
     const item = e.target.closest('.choice'); if (!item) return;
     document.querySelectorAll('#level-choices .choice').forEach(c=>c.classList.remove('active'));
@@ -330,7 +401,9 @@ function renderOnboarding() {
     const goal = document.querySelector('#goal-choices .choice.active')?.dataset.val ?? 'Hypertrophie';
     const favorites = Array.from(document.getElementById('gym-select').selectedOptions).map(o=>o.value);
     const bio = document.getElementById('bio').value.trim();
-    state.me = { ...state.me, name, level, goal, favorites, bio };
+    const regionCode = document.getElementById('onb-region').value || null;
+    const departmentCode = document.getElementById('onb-dept').value || null;
+    state.me = { ...state.me, name, level, goal, favorites, bio, regionCode, departmentCode };
     syncAccountWithMe();
     saveState();
     showToast('Profil enregistré');
@@ -388,7 +461,7 @@ function renderSwipeDeckInto(root, recos) {
   let index = 0;
   function draw() {
     root.innerHTML = '';
-    if (index >= recos.length) { root.innerHTML = `<div class="muted" style="padding:20px">Plus de recommandations. Revenez plus tard.</div>`; return; }
+    if (index >= recos.length) { root.innerHTML = `<div class=\"muted\" style=\"padding:20px\">Plus de recommandations. Revenez plus tard.</div>`; return; }
     const r = recos[index];
     const el = document.createElement('div');
     el.className = 'swipe-card';
@@ -398,14 +471,10 @@ function renderSwipeDeckInto(root, recos) {
     const like = el.querySelector('[data-like]');
     const pass = el.querySelector('[data-pass]');
     const detail = el.querySelector('[data-detail]');
-    const msgBtn = el.querySelector('[data-message]');
-    const planBtn = el.querySelector('[data-propose]');
 
     like.addEventListener('click', () => onSwipe(r.user, 'like'));
     pass.addEventListener('click', () => onSwipe(r.user, 'pass'));
     detail.addEventListener('click', () => openProfileModal(r.user));
-    msgBtn.addEventListener('click', () => startChatWith(r.user));
-    planBtn.addEventListener('click', () => { ensureChatForMatch(r.user.id); openPlanner(r.user); });
 
     // Drag swipe
     let startX = 0, startY = 0, dragging = false;
@@ -524,10 +593,6 @@ function matchCardHTML(user, score) {
         <button class="btn" data-detail>Voir</button>
         <button class="btn success" data-like>Like</button>
       </div>
-      <div class="actions">
-        <button class="btn" data-message>💬 Message</button>
-        <button class="btn" data-propose>📅 Planifier</button>
-      </div>
     </div>
   `;
 }
@@ -547,7 +612,8 @@ function openProfileModal(user) {
       </div>
       <div class="row" style="gap:8px">
         <button class="btn success" id="like-from-modal">Like</button>
-        <button class="btn" id="propose-session">Proposer une séance</button>
+        <button class="btn" id="message-user">Message</button>
+        <button class="btn" id="propose-session">Planifier</button>
       </div>
     </div>
   `;
@@ -559,10 +625,8 @@ function openProfileModal(user) {
     state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: user.id, decision: 'like', createdAt: Date.now() });
     saveState(); showToast('Like envoyé');
   };
-  document.getElementById('propose-session').onclick = () => {
-    ensureChatForMatch(user.id);
-    openPlanner(user);
-  };
+  document.getElementById('message-user').onclick = () => { startChatWith(user); container.remove(); };
+  document.getElementById('propose-session').onclick = () => { ensureChatForMatch(user.id); openPlanner(user); };
 }
 
 function ensureChatForMatch(userId) {
@@ -611,19 +675,36 @@ function renderSearch() {
           </select>
         </div>
       </div>
+      <div class="grid cols-2">
+        <div>
+          <label>Région</label>
+          <select id="f-region" class="input"></select>
+        </div>
+        <div>
+          <label>Département</label>
+          <select id="f-dept" class="input"></select>
+        </div>
+      </div>
       <div>
         <button id="apply-filters" class="btn primary">Appliquer</button>
       </div>
     </div>
     <div id="results"></div>
   `;
+
+  setupRegionDept('f-region', 'f-dept', '', '');
+
   document.getElementById('apply-filters').addEventListener('click', () => {
     const level = document.getElementById('f-level').value;
     const gym = document.getElementById('f-gym').value;
     const day = parseInt(document.getElementById('f-day').value);
+    const regionCode = document.getElementById('f-region').value;
+    const departmentCode = document.getElementById('f-dept').value;
     const items = state.users.filter(u => {
       if (level !== '' && parseInt(level) !== u.level) return false;
       if (gym && !u.favorites.includes(gym)) return false;
+      if (regionCode && u.regionCode !== regionCode) return false;
+      if (departmentCode && u.departmentCode !== departmentCode) return false;
       if (day >= 0) {
         const bits = base64ToBits(u.availabilityMask);
         const hasDay = bits.slice(day*48, (day+1)*48).some(b=>b===1);
@@ -851,6 +932,13 @@ function renderProfile() {
           </div>
         </div>
         <div>
+          <label>Région / Département</label>
+          <div class="grid cols-2">
+            <select id="me-region" class="input"></select>
+            <select id="me-dept" class="input"></select>
+          </div>
+        </div>
+        <div>
           <label>Bio</label>
           <textarea id="me-bio" rows="4" class="input">${me.bio ?? ''}</textarea>
         </div>
@@ -862,9 +950,12 @@ function renderProfile() {
       </div>
     </div>
   `;
+  setupRegionDept('me-region', 'me-dept', me.regionCode, me.departmentCode);
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;
     state.me.bio = document.getElementById('me-bio').value.trim();
+    state.me.regionCode = document.getElementById('me-region').value || null;
+    state.me.departmentCode = document.getElementById('me-dept').value || null;
     syncAccountWithMe(); saveState(); showToast('Profil mis à jour');
   };
   document.getElementById('reset').onclick = () => {
@@ -961,6 +1052,13 @@ function renderAuth() {
             <label>Mot de passe</label>
             <input id="su-pass" class="input" type="password" placeholder="Mot de passe" />
           </div>
+          <div>
+            <label>Région / Département</label>
+            <div class="grid cols-2">
+              <select id="su-region" class="input"></select>
+              <select id="su-dept" class="input"></select>
+            </div>
+          </div>
           <button id="btn-signup" class="btn success">Créer un compte</button>
         </div>
       </div>
@@ -975,6 +1073,8 @@ function renderAuth() {
   loginTab.onclick = showLogin; signupTab.onclick = showSignup;
   showLogin();
 
+  setupRegionDept('su-region', 'su-dept', '', '');
+
   document.getElementById('btn-login').onclick = () => {
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     const pass = document.getElementById('login-pass').value;
@@ -988,6 +1088,8 @@ function renderAuth() {
     const name = document.getElementById('su-name').value.trim();
     const email = document.getElementById('su-email').value.trim().toLowerCase();
     const pass = document.getElementById('su-pass').value;
+    const regionCode = document.getElementById('su-region').value || null;
+    const departmentCode = document.getElementById('su-dept').value || null;
     if (!name || !email || !pass) { showToast('Complétez tous les champs'); return; }
     if (state.accounts.some(a => (a.email||'').toLowerCase() === email)) { showToast('Email déjà utilisé'); return; }
     const id = `acc_${Date.now()}`;
@@ -1002,6 +1104,8 @@ function renderAuth() {
       favorites: [state.gyms[0]?.id].filter(Boolean),
       availabilityMask: generateRandomWeekMask(0.3),
       bio: '',
+      regionCode,
+      departmentCode,
     };
     state.accounts.push(account);
     state.me = { ...account };
