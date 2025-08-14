@@ -1,4 +1,4 @@
-# Gym Buddy – Prototype
+# GoGymTogether – Prototype
 
 Static prototype with onboarding, matching (swipe/list), filters, profile, chat, session planning and .ics export. Uses localStorage and mock data.
 

@@ -928,8 +928,8 @@ function formatSlot(dt) { const days = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim
 
 function downloadICS({ title, description, location, start, end }) {
   function formatICSDate(d) { const pad = (n)=>String(n).padStart(2,'0'); return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`; }
-  const uid = `sess-${Date.now()}@gym-buddy`;
-  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Gym Buddy Proto//FR','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${uid}`,`DTSTAMP:${formatICSDate(new Date())}`,`DTSTART:${formatICSDate(start)}`,`DTEND:${formatICSDate(end)}`,`SUMMARY:${title}`,`DESCRIPTION:${description}`,`LOCATION:${location}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const uid = `sess-${Date.now()}@gogymtogether`;
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//GoGymTogether Proto//FR','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${uid}`,`DTSTAMP:${formatICSDate(new Date())}`,`DTSTART:${formatICSDate(start)}`,`DTEND:${formatICSDate(end)}`,`SUMMARY:${title}`,`DESCRIPTION:${description}`,`LOCATION:${location}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
   const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'seance.ics'; a.click(); setTimeout(()=>URL.revokeObjectURL(url), 1000);
 }
 
