@@ -49,6 +49,78 @@ const FR_DEPARTMENTS = {
   BRE: [ { code: "35", name: "Ille-et-Vilaine" } ],
 };
 
+// Dynamic Geo API cache and loaders
+const geoCache = { regions: null, departmentsByRegion: {}, citiesByDept: {} };
+async function fetchRegions() {
+  if (geoCache.regions) return geoCache.regions;
+  try {
+    const res = await fetch('https://geo.api.gouv.fr/regions?fields=code,nom');
+    const list = await res.json();
+    geoCache.regions = list.map(r => ({ code: r.code, name: r.nom }));
+  } catch (e) {
+    geoCache.regions = FR_REGIONS; // fallback subset
+  }
+  return geoCache.regions;
+}
+async function fetchDepartments(regionCode) {
+  if (!regionCode) return [];
+  if (geoCache.departmentsByRegion[regionCode]) return geoCache.departmentsByRegion[regionCode];
+  try {
+    const res = await fetch(`https://geo.api.gouv.fr/regions/${regionCode}/departements?fields=code,nom`);
+    const list = await res.json();
+    geoCache.departmentsByRegion[regionCode] = list.map(d => ({ code: d.code, name: d.nom }));
+  } catch (e) {
+    geoCache.departmentsByRegion[regionCode] = FR_DEPARTMENTS[regionCode] || [];
+  }
+  return geoCache.departmentsByRegion[regionCode];
+}
+async function fetchCities(departmentCode) {
+  if (!departmentCode) return [];
+  if (geoCache.citiesByDept[departmentCode]) return geoCache.citiesByDept[departmentCode];
+  try {
+    const res = await fetch(`https://geo.api.gouv.fr/departements/${departmentCode}/communes?fields=nom&format=json`);
+    const list = await res.json();
+    geoCache.citiesByDept[departmentCode] = list.map(c => c.nom).sort((a,b)=>a.localeCompare(b));
+  } catch (e) {
+    // fallback: infer from gyms
+    const cities = Array.from(new Set(state.gyms.filter(g => g.departmentCode === departmentCode).map(g => g.city))).sort((a,b)=>a.localeCompare(b));
+    geoCache.citiesByDept[departmentCode] = cities;
+  }
+  return geoCache.citiesByDept[departmentCode];
+}
+function setupGeoCascade(prefix, { initial = {}, onChange } = {}) {
+  const regionSel = document.getElementById(`${prefix}-region`);
+  const deptSel = document.getElementById(`${prefix}-dept`);
+  const citySel = document.getElementById(`${prefix}-city`);
+  if (!regionSel || !deptSel || !citySel) return;
+  // Regions
+  fetchRegions().then(regions => {
+    regionSel.innerHTML = `<option value="">Région</option>` + regions.map(r=>`<option value="${r.code}">${r.name}</option>`).join('');
+    if (initial.regionCode) regionSel.value = initial.regionCode;
+    const loadDepts = () => {
+      const rc = regionSel.value;
+      fetchDepartments(rc).then(deps => {
+        deptSel.innerHTML = `<option value="">Département</option>` + deps.map(d=>`<option value="${d.code}">${d.name}</option>`).join('');
+        deptSel.disabled = !rc;
+        if (initial.departmentCode && deps.some(d=>d.code===initial.departmentCode)) deptSel.value = initial.departmentCode;
+        loadCities();
+      });
+    };
+    const loadCities = () => {
+      const dc = deptSel.value;
+      fetchCities(dc).then(cities => {
+        citySel.innerHTML = `<option value="">Ville</option>` + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
+        citySel.disabled = !dc || cities.length===0;
+        if (initial.city && cities.includes(initial.city)) citySel.value = initial.city;
+        if (typeof onChange === 'function') onChange();
+      });
+    };
+    regionSel.addEventListener('change', () => { initial.departmentCode = null; initial.city = null; loadDepts(); });
+    deptSel.addEventListener('change', () => { initial.city = null; loadCities(); });
+    loadDepts();
+  });
+}
+
 function setupRegionDept(regionSelectId, deptSelectId, initialRegion, initialDept) {
   const rSel = document.getElementById(regionSelectId);
   const dSel = document.getElementById(deptSelectId);
@@ -87,22 +159,9 @@ function setupGymCascade(prefix, { multipleGyms = false, initial = {} } = {}) {
   const gymSel = document.getElementById(`${prefix}-gym`);
   if (!chainSel || !regionSel || !deptSel || !citySel || !gymSel) return;
 
-  // Fill chains
   chainSel.innerHTML = `<option value="">Toutes marques</option>` + state.gymChains.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   if (initial.chainId) chainSel.value = initial.chainId;
 
-  // Region/Dept
-  setupRegionDept(`${prefix}-region`, `${prefix}-dept`, initial.regionCode || '', initial.departmentCode || '');
-
-  // Cities
-  const refreshCities = () => {
-    const cities = getCitiesFor(regionSel.value || '', deptSel.value || '', chainSel.value || '');
-    citySel.innerHTML = `<option value="">Toutes villes</option>` + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
-    citySel.disabled = cities.length === 0;
-    if (initial.city && cities.includes(initial.city)) citySel.value = initial.city;
-  };
-
-  // Gyms
   const refreshGyms = () => {
     const gyms = getFilteredGyms({ chainId: chainSel.value || '', regionCode: regionSel.value || '', departmentCode: deptSel.value || '', city: citySel.value || '' });
     gymSel.innerHTML = (multipleGyms ? '' : `<option value="">${gyms.length? 'Toutes salles' : 'Aucune salle'}</option>`) + gyms.map(g=>`<option value="${g.id}">${g.name} — ${g.city}</option>`).join('');
@@ -114,12 +173,9 @@ function setupGymCascade(prefix, { multipleGyms = false, initial = {} } = {}) {
     }
   };
 
-  chainSel.addEventListener('change', () => { initial.city = null; initial.gymIds = null; refreshCities(); refreshGyms(); });
-  regionSel.addEventListener('change', () => { initial.city = null; initial.gymIds = null; refreshCities(); refreshGyms(); });
-  deptSel.addEventListener('change', () => { initial.city = null; initial.gymIds = null; refreshCities(); refreshGyms(); });
-  citySel.addEventListener('change', () => { initial.gymIds = null; refreshGyms(); });
-
-  refreshCities();
+  setupGeoCascade(prefix, { initial: { regionCode: initial.regionCode || '', departmentCode: initial.departmentCode || '', city: initial.city || '' }, onChange: refreshGyms });
+  chainSel.addEventListener('change', refreshGyms);
+  // initial fill
   refreshGyms();
 }
 
@@ -888,19 +944,8 @@ function renderProfile() {
       </div>
     </div>
   `;
-  // Setup cascades
-  setupRegionDept('me-region', 'me-dept', me.regionCode, me.departmentCode);
-  const meCitySel = document.getElementById('me-city');
-  const refreshMeCities = () => {
-    const cities = getCitiesFor(document.getElementById('me-region').value || '', document.getElementById('me-dept').value || '', '');
-    meCitySel.innerHTML = `<option value="">Ville</option>` + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
-    meCitySel.value = me.city || '';
-  };
-  document.getElementById('me-region').addEventListener('change', () => { me.city = ''; refreshMeCities(); });
-  document.getElementById('me-dept').addEventListener('change', () => { me.city = ''; refreshMeCities(); });
-  refreshMeCities();
-  setupGymCascade('me', { multipleGyms: true, initial: { chainId: '', regionCode: me.regionCode, departmentCode: me.departmentCode, city: me.city, gymIds: me.favorites } });
-
+  // Use unified cascade
+  setupGymCascade('me', { multipleGyms: true, initial: { regionCode: me.regionCode, departmentCode: me.departmentCode, city: me.city, gymIds: me.favorites } });
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;
     state.me.bio = document.getElementById('me-bio').value.trim();
