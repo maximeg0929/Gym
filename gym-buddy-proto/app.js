@@ -25,7 +25,7 @@ const defaultState = {
   auth: { currentUserId: null },
 };
 
-// FR regions & departments (subset representative + common ones)
+// FR regions & departments (subset)
 const FR_REGIONS = [
   { code: "IDF", name: "Île-de-France" },
   { code: "ARA", name: "Auvergne-Rhône-Alpes" },
@@ -36,29 +36,17 @@ const FR_REGIONS = [
   { code: "GE", name: "Grand Est" },
   { code: "PL", name: "Pays de la Loire" },
   { code: "BRE", name: "Bretagne" },
-  { code: "BFC", name: "Bourgogne-Franche-Comté" },
-  { code: "CVL", name: "Centre-Val de Loire" },
-  { code: "NOR", name: "Normandie" },
-  { code: "COR", name: "Corse" },
 ];
 const FR_DEPARTMENTS = {
-  IDF: [
-    { code: "75", name: "Paris" }, { code: "77", name: "Seine-et-Marne" }, { code: "78", name: "Yvelines" },
-    { code: "91", name: "Essonne" }, { code: "92", name: "Hauts-de-Seine" }, { code: "93", name: "Seine-Saint-Denis" },
-    { code: "94", name: "Val-de-Marne" }, { code: "95", name: "Val-d'Oise" },
-  ],
-  ARA: [ { code: "01", name: "Ain" }, { code: "07", name: "Ardèche" }, { code: "26", name: "Drôme" }, { code: "38", name: "Isère" }, { code: "42", name: "Loire" }, { code: "43", name: "Haute-Loire" }, { code: "63", name: "Puy-de-Dôme" }, { code: "69", name: "Rhône" }, { code: "73", name: "Savoie" }, { code: "74", name: "Haute-Savoie" } ],
-  PAC: [ { code: "04", name: "Alpes-de-Haute-Provence" }, { code: "05", name: "Hautes-Alpes" }, { code: "06", name: "Alpes-Maritimes" }, { code: "13", name: "Bouches-du-Rhône" }, { code: "83", name: "Var" }, { code: "84", name: "Vaucluse" } ],
-  NAQ: [ { code: "16", name: "Charente" }, { code: "17", name: "Charente-Maritime" }, { code: "19", name: "Corrèze" }, { code: "23", name: "Creuse" }, { code: "24", name: "Dordogne" }, { code: "33", name: "Gironde" }, { code: "40", name: "Landes" }, { code: "47", name: "Lot-et-Garonne" }, { code: "64", name: "Pyrénées-Atlantiques" }, { code: "79", name: "Deux-Sèvres" }, { code: "86", name: "Vienne" }, { code: "87", name: "Haute-Vienne" } ],
-  OCC: [ { code: "09", name: "Ariège" }, { code: "11", name: "Aude" }, { code: "12", name: "Aveyron" }, { code: "30", name: "Gard" }, { code: "31", name: "Haute-Garonne" }, { code: "32", name: "Gers" }, { code: "34", name: "Hérault" }, { code: "46", name: "Lot" }, { code: "48", name: "Lozère" }, { code: "65", name: "Hautes-Pyrénées" }, { code: "66", name: "Pyrénées-Orientales" }, { code: "81", name: "Tarn" }, { code: "82", name: "Tarn-et-Garonne" } ],
-  HDF: [ { code: "02", name: "Aisne" }, { code: "59", name: "Nord" }, { code: "60", name: "Oise" }, { code: "62", name: "Pas-de-Calais" }, { code: "80", name: "Somme" } ],
-  GE:  [ { code: "08", name: "Ardennes" }, { code: "10", name: "Aube" }, { code: "51", name: "Marne" }, { code: "52", name: "Haute-Marne" }, { code: "54", name: "Meurthe-et-Moselle" }, { code: "55", name: "Meuse" }, { code: "57", name: "Moselle" }, { code: "67", name: "Bas-Rhin" }, { code: "68", name: "Haut-Rhin" }, { code: "88", name: "Vosges" } ],
-  PL:  [ { code: "44", name: "Loire-Atlantique" }, { code: "49", name: "Maine-et-Loire" }, { code: "53", name: "Mayenne" }, { code: "72", name: "Sarthe" }, { code: "85", name: "Vendée" } ],
-  BRE: [ { code: "22", name: "Côtes-d'Armor" }, { code: "29", name: "Finistère" }, { code: "35", name: "Ille-et-Vilaine" }, { code: "56", name: "Morbihan" } ],
-  BFC: [ { code: "21", name: "Côte-d'Or" }, { code: "25", name: "Doubs" }, { code: "39", name: "Jura" }, { code: "58", name: "Nièvre" }, { code: "70", name: "Haute-Saône" }, { code: "71", name: "Saône-et-Loire" }, { code: "89", name: "Yonne" }, { code: "90", name: "Territoire de Belfort" } ],
-  CVL: [ { code: "18", name: "Cher" }, { code: "28", name: "Eure-et-Loir" }, { code: "36", name: "Indre" }, { code: "37", name: "Indre-et-Loire" }, { code: "41", name: "Loir-et-Cher" }, { code: "45", name: "Loiret" } ],
-  NOR: [ { code: "14", name: "Calvados" }, { code: "27", name: "Eure" }, { code: "50", name: "Manche" }, { code: "61", name: "Orne" }, { code: "76", name: "Seine-Maritime" } ],
-  COR: [ { code: "2A", name: "Corse-du-Sud" }, { code: "2B", name: "Haute-Corse" } ],
+  IDF: [ { code: "75", name: "Paris" }, { code: "92", name: "Hauts-de-Seine" }, { code: "93", name: "Seine-Saint-Denis" }, { code: "94", name: "Val-de-Marne" }, { code: "91", name: "Essonne" }, { code: "78", name: "Yvelines" } ],
+  ARA: [ { code: "69", name: "Rhône" }, { code: "38", name: "Isère" }, { code: "73", name: "Savoie" } ],
+  PAC: [ { code: "13", name: "Bouches-du-Rhône" }, { code: "06", name: "Alpes-Maritimes" } ],
+  NAQ: [ { code: "33", name: "Gironde" } ],
+  OCC: [ { code: "31", name: "Haute-Garonne" } ],
+  HDF: [ { code: "59", name: "Nord" } ],
+  GE:  [ { code: "67", name: "Bas-Rhin" } ],
+  PL:  [ { code: "44", name: "Loire-Atlantique" } ],
+  BRE: [ { code: "35", name: "Ille-et-Vilaine" } ],
 };
 
 function setupRegionDept(regionSelectId, deptSelectId, initialRegion, initialDept) {
@@ -76,6 +64,63 @@ function setupRegionDept(regionSelectId, deptSelectId, initialRegion, initialDep
   };
   rSel.addEventListener('change', () => { initialDept = null; refreshDepts(); });
   refreshDepts();
+}
+
+// Gym cascade helpers
+function getFilteredGyms({ chainId, regionCode, departmentCode, city }) {
+  return state.gyms.filter(g =>
+    (!chainId || g.chainId === chainId) &&
+    (!regionCode || g.regionCode === regionCode) &&
+    (!departmentCode || g.departmentCode === departmentCode) &&
+    (!city || g.city === city)
+  );
+}
+function getCitiesFor(regionCode, departmentCode, chainId) {
+  const gyms = getFilteredGyms({ chainId, regionCode, departmentCode });
+  return Array.from(new Set(gyms.map(g => g.city))).sort((a,b)=>a.localeCompare(b));
+}
+function setupGymCascade(prefix, { multipleGyms = false, initial = {} } = {}) {
+  const chainSel = document.getElementById(`${prefix}-chain`);
+  const regionSel = document.getElementById(`${prefix}-region`);
+  const deptSel = document.getElementById(`${prefix}-dept`);
+  const citySel = document.getElementById(`${prefix}-city`);
+  const gymSel = document.getElementById(`${prefix}-gym`);
+  if (!chainSel || !regionSel || !deptSel || !citySel || !gymSel) return;
+
+  // Fill chains
+  chainSel.innerHTML = `<option value="">Toutes marques</option>` + state.gymChains.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  if (initial.chainId) chainSel.value = initial.chainId;
+
+  // Region/Dept
+  setupRegionDept(`${prefix}-region`, `${prefix}-dept`, initial.regionCode || '', initial.departmentCode || '');
+
+  // Cities
+  const refreshCities = () => {
+    const cities = getCitiesFor(regionSel.value || '', deptSel.value || '', chainSel.value || '');
+    citySel.innerHTML = `<option value="">Toutes villes</option>` + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
+    citySel.disabled = cities.length === 0;
+    if (initial.city && cities.includes(initial.city)) citySel.value = initial.city;
+  };
+
+  // Gyms
+  const refreshGyms = () => {
+    const gyms = getFilteredGyms({ chainId: chainSel.value || '', regionCode: regionSel.value || '', departmentCode: deptSel.value || '', city: citySel.value || '' });
+    gymSel.innerHTML = (multipleGyms ? '' : `<option value="">${gyms.length? 'Toutes salles' : 'Aucune salle'}</option>`) + gyms.map(g=>`<option value="${g.id}">${g.name} — ${g.city}</option>`).join('');
+    gymSel.disabled = gyms.length === 0;
+    if (multipleGyms && Array.isArray(initial.gymIds)) {
+      Array.from(gymSel.options).forEach(o => { o.selected = initial.gymIds.includes(o.value); });
+    } else if (!multipleGyms && initial.gymId) {
+      gymSel.value = initial.gymId;
+    }
+  };
+
+  chainSel.addEventListener('change', () => { initial.city = null; initial.gymIds = null; refreshCities(); refreshGyms(); });
+  regionSel.addEventListener('change', () => { initial.city = null; initial.gymIds = null; refreshCities(); refreshGyms(); });
+  deptSel.addEventListener('change', () => { initial.city = null; initial.gymIds = null; refreshCities(); refreshGyms(); });
+  citySel.addEventListener('change', () => { initial.gymIds = null; refreshGyms(); });
+
+  refreshCities();
+  refreshGyms();
 }
 
 let state = loadState();
@@ -122,25 +167,61 @@ function syncAccountWithMe() {
   }
 }
 
-// Seed data: gyms, users
+// Seed data: chains, gyms, users
 function seed() {
   const gymChains = [
-    { id: "chain_basicfit", name: "Basic-Fit", logoUrl: "" },
-    { id: "chain_fitnesspark", name: "Fitness Park", logoUrl: "" },
-    { id: "chain_cm", name: "Club Med Gym", logoUrl: "" },
+    { id: "chain_basicfit", name: "Basic-Fit" },
+    { id: "chain_fitnesspark", name: "Fitness Park" },
+    { id: "chain_neoness", name: "Neoness" },
+    { id: "chain_keepcool", name: "Keepcool" },
+    { id: "chain_orange_bleue", name: "L'Orange Bleue" },
+    { id: "chain_lappart", name: "L'Appart Fitness" },
+    { id: "chain_magic_form", name: "Magic Form" },
+    { id: "chain_amazonia", name: "Amazonia" },
+    { id: "chain_cercles_forme", name: "Cercles de la Forme" },
+    { id: "chain_wellness", name: "Wellness Sport Club" },
+    { id: "chain_vita_liberte", name: "Vita Liberté" },
   ];
   const gyms = [
-    { id: "gym_bf_1", chainId: "chain_basicfit", name: "Basic-Fit Bastille", city: "Paris", lat: 48.853, lon: 2.369 },
-    { id: "gym_bf_2", chainId: "chain_basicfit", name: "Basic-Fit Montparnasse", city: "Paris", lat: 48.842, lon: 2.321 },
-    { id: "gym_fp_1", chainId: "chain_fitnesspark", name: "Fitness Park République", city: "Paris", lat: 48.867, lon: 2.364 },
-    { id: "gym_fp_2", chainId: "chain_fitnesspark", name: "Fitness Park Lyon Part-Dieu", city: "Lyon", lat: 45.760, lon: 4.861 },
+    // IDF - Paris (75)
+    { id: "gym_bf_bastille", chainId: "chain_basicfit", name: "Basic-Fit Bastille", regionCode: "IDF", departmentCode: "75", city: "Paris", lat: 48.853, lon: 2.369 },
+    { id: "gym_bf_montparnasse", chainId: "chain_basicfit", name: "Basic-Fit Montparnasse", regionCode: "IDF", departmentCode: "75", city: "Paris", lat: 48.842, lon: 2.321 },
+    { id: "gym_fp_republique", chainId: "chain_fitnesspark", name: "Fitness Park République", regionCode: "IDF", departmentCode: "75", city: "Paris", lat: 48.867, lon: 2.364 },
+    { id: "gym_neoness_bourse", chainId: "chain_neoness", name: "Neoness Bourse", regionCode: "IDF", departmentCode: "75", city: "Paris", lat: 48.868, lon: 2.341 },
+    { id: "gym_keepcool_lazare", chainId: "chain_keepcool", name: "Keepcool Saint-Lazare", regionCode: "IDF", departmentCode: "75", city: "Paris", lat: 48.876, lon: 2.325 },
+    { id: "gym_cercles_diderot", chainId: "chain_cercles_forme", name: "Cercles de la Forme Diderot", regionCode: "IDF", departmentCode: "75", city: "Paris", lat: 48.842, lon: 2.386 },
+    // ARA - Lyon (69)
+    { id: "gym_fp_partdieu", chainId: "chain_fitnesspark", name: "Fitness Park Part-Dieu", regionCode: "ARA", departmentCode: "69", city: "Lyon", lat: 45.760, lon: 4.861 },
+    { id: "gym_lappart_bellecour", chainId: "chain_lappart", name: "L'Appart Fitness Bellecour", regionCode: "ARA", departmentCode: "69", city: "Lyon", lat: 45.757, lon: 4.835 },
+    { id: "gym_bf_vaise", chainId: "chain_basicfit", name: "Basic-Fit Vaise", regionCode: "ARA", departmentCode: "69", city: "Lyon", lat: 45.780, lon: 4.805 },
+    { id: "gym_wellness_lyon", chainId: "chain_wellness", name: "Wellness Sport Club Lyon", regionCode: "ARA", departmentCode: "69", city: "Lyon", lat: 45.757, lon: 4.845 },
+    { id: "gym_orange_villeurbanne", chainId: "chain_orange_bleue", name: "L'Orange Bleue Villeurbanne", regionCode: "ARA", departmentCode: "69", city: "Villeurbanne", lat: 45.770, lon: 4.880 },
+    // PAC - Marseille (13)
+    { id: "gym_keepcool_prado", chainId: "chain_keepcool", name: "Keepcool Prado", regionCode: "PAC", departmentCode: "13", city: "Marseille", lat: 43.273, lon: 5.394 },
+    { id: "gym_bf_joliette", chainId: "chain_basicfit", name: "Basic-Fit La Joliette", regionCode: "PAC", departmentCode: "13", city: "Marseille", lat: 43.309, lon: 5.369 },
+    { id: "gym_vita_marseille", chainId: "chain_vita_liberte", name: "Vita Liberté Marseille", regionCode: "PAC", departmentCode: "13", city: "Marseille", lat: 43.296, lon: 5.370 },
+    // NAQ - Bordeaux (33)
+    { id: "gym_magic_bordeaux", chainId: "chain_magic_form", name: "Magic Form Bordeaux", regionCode: "NAQ", departmentCode: "33", city: "Bordeaux", lat: 44.837, lon: -0.579 },
+    { id: "gym_amazonia_bordeaux", chainId: "chain_amazonia", name: "Amazonia Bordeaux", regionCode: "NAQ", departmentCode: "33", city: "Bordeaux", lat: 44.840, lon: -0.580 },
+    // OCC - Toulouse (31)
+    { id: "gym_fp_blagnac", chainId: "chain_fitnesspark", name: "Fitness Park Blagnac", regionCode: "OCC", departmentCode: "31", city: "Toulouse", lat: 43.629, lon: 1.363 },
+    { id: "gym_keepcool_capitole", chainId: "chain_keepcool", name: "Keepcool Capitole", regionCode: "OCC", departmentCode: "31", city: "Toulouse", lat: 43.604, lon: 1.444 },
+    // HDF - Lille (59)
+    { id: "gym_bf_lille", chainId: "chain_basicfit", name: "Basic-Fit Lille Centre", regionCode: "HDF", departmentCode: "59", city: "Lille", lat: 50.631, lon: 3.058 },
+    // BRE - Rennes (35)
+    { id: "gym_orange_rennes", chainId: "chain_orange_bleue", name: "L'Orange Bleue Rennes", regionCode: "BRE", departmentCode: "35", city: "Rennes", lat: 48.117, lon: -1.677 },
+    // PL - Nantes (44)
+    { id: "gym_bf_nantes", chainId: "chain_basicfit", name: "Basic-Fit Nantes Centre", regionCode: "PL", departmentCode: "44", city: "Nantes", lat: 47.218, lon: -1.553 },
+    // GE - Strasbourg (67)
+    { id: "gym_fp_strasbourg", chainId: "chain_fitnesspark", name: "Fitness Park Strasbourg", regionCode: "GE", departmentCode: "67", city: "Strasbourg", lat: 48.583, lon: 7.745 },
   ];
+
   const demoUsers = generateDemoUsers(gyms);
   const me = {
     id: "me",
     name: "Alex",
     photoUrl: avatar("Alex"),
-    level: 1, // 0: Débutant, 1: Intermédiaire, 2: Avancé, 3: Compétition
+    level: 1,
     goal: "Hypertrophie",
     favorites: [gyms[0].id, gyms[2].id],
     availabilityMask: generateRandomWeekMask(0.35),
@@ -148,6 +229,7 @@ function seed() {
     email: "alex@example.com",
     regionCode: "IDF",
     departmentCode: "75",
+    city: "Paris",
   };
   return {
     ...structuredClone(defaultState),
@@ -168,10 +250,9 @@ function avatar(name) {
   return `https://api.dicebear.com/7.x/thumbs/svg?seed=${seed}`;
 }
 
-function randomRegionDept() {
-  const region = sample(FR_REGIONS);
-  const dept = sample(FR_DEPARTMENTS[region.code] || [{ code: "75", name: "Paris" }]);
-  return { regionCode: region.code, departmentCode: dept.code };
+function randomRegionDeptCity(gyms) {
+  const g = sample(gyms);
+  return { regionCode: g.regionCode, departmentCode: g.departmentCode, city: g.city };
 }
 
 function generateDemoUsers(gyms) {
@@ -180,11 +261,11 @@ function generateDemoUsers(gyms) {
     "Thomas", "Sarah", "Antoine", "Noah", "Maya", "Hugo", "Lola", "Adam", "Chloé", "Lucas",
   ];
   const goals = ["Force", "Hypertrophie", "Perte de poids", "Endurance"];
-  const users = names.map((n, idx) => {
+  return names.map((n, idx) => {
     const level = Math.floor(Math.random() * 4);
     const favorites = [sample(gyms).id];
     if (Math.random() > 0.6) favorites.push(sample(gyms).id);
-    const { regionCode, departmentCode } = randomRegionDept();
+    const loc = randomRegionDeptCity(gyms);
     return {
       id: "u_" + idx,
       name: n,
@@ -194,11 +275,11 @@ function generateDemoUsers(gyms) {
       favorites: Array.from(new Set(favorites)),
       availabilityMask: generateRandomWeekMask(randomBetween(0.2, 0.6)),
       bio: genBio(level),
-      regionCode,
-      departmentCode,
+      regionCode: loc.regionCode,
+      departmentCode: loc.departmentCode,
+      city: loc.city,
     };
   });
-  return users;
 }
 
 function genBio(level) {
@@ -235,19 +316,14 @@ function base64ToBits(b64, length = 336) {
   return bits;
 }
 function jaccardFromMasks(aB64, bB64) {
-  const a = base64ToBits(aB64);
-  const b = base64ToBits(bB64);
-  let inter = 0, uni = 0;
-  for (let i = 0; i < a.length; i++) {
-    const ai = a[i], bi = b[i];
-    inter += (ai & bi);
-    uni += (ai | bi);
-  }
+  const a = base64ToBits(aB64); const b = base64ToBits(bB64); let inter = 0, uni = 0;
+  for (let i = 0; i < a.length; i++) { const ai = a[i], bi = b[i]; inter += (ai & bi); uni += (ai | bi); }
   return uni === 0 ? 0 : inter / uni;
 }
 
 // Distance helper (approx) in km
 function haversineKm(lat1, lon1, lat2, lon2) {
+  if ([lat1, lon1, lat2, lon2].some(v => typeof v !== 'number' || Number.isNaN(v))) return 10;
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -258,24 +334,31 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 
 function gymScore(userA, userB) {
   const gyms = state.gyms;
-  const favoritesA = userA.favorites.map(id => gyms.find(g => g.id === id));
-  const favoritesB = userB.favorites.map(id => gyms.find(g => g.id === id));
+  const favoritesA = userA.favorites.map(id => gyms.find(g => g.id === id)).filter(Boolean);
+  const favoritesB = userB.favorites.map(id => gyms.find(g => g.id === id)).filter(Boolean);
   let best = 0;
   for (const ga of favoritesA) {
     for (const gb of favoritesB) {
-      if (!ga || !gb) continue;
       const sameGym = ga.id === gb.id;
-      const sameChain = ga.chainId && ga.chainId === gb.chainId;
+      const sameCity = ga.city === gb.city;
+      const sameDept = ga.departmentCode === gb.departmentCode;
+      const sameChain = ga.chainId === gb.chainId;
       const dist = haversineKm(ga.lat, ga.lon, gb.lat, gb.lon);
-      if (sameGym) best = Math.max(best, 1.0);
-      else if (sameChain) {
-        const base = Math.max(0, 1 - dist / 10); // 0..1
-        best = Math.max(best, Math.min(0.8, base));
-      } else {
-        const base = Math.max(0, 1 - dist / 10);
-        best = Math.max(best, Math.min(0.5, base));
-      }
+      let s = 0;
+      if (sameGym) s = 1.0;
+      else if (sameCity && sameChain) s = 0.9;
+      else if (sameCity) s = 0.75;
+      else if (sameDept && sameChain) s = 0.7;
+      else if (sameDept) s = 0.55;
+      else if (sameChain) s = Math.min(0.8, Math.max(0, 1 - dist / 10));
+      else s = Math.min(0.5, Math.max(0, 1 - dist / 10));
+      best = Math.max(best, s);
     }
+  }
+  // If no favorites overlap info, fallback to city/department from profile
+  if (best === 0 && userA.city && userB.city) {
+    if (userA.city === userB.city) best = 0.6;
+    else if (userA.departmentCode && userA.departmentCode === userB.departmentCode) best = 0.45;
   }
   return best;
 }
@@ -288,7 +371,7 @@ function levelScore(a, b) {
 
 function matchScore(a, b) {
   const schedule = jaccardFromMasks(a.availabilityMask, b.availabilityMask);
-  const gym = gymScore(a, b);
+  const gym = gymScore(a, b); // incorporates city & department
   const level = levelScore(a, b);
   return 0.4 * schedule + 0.4 * gym + 0.2 * level;
 }
@@ -305,13 +388,8 @@ function getRecommendations(limit = 20) {
 
 // Router
 function setRoute(route) {
-  // Route guard for unauthenticated users
-  if (!state.me && route !== "auth" && route !== "onboarding") {
-    route = "auth";
-  }
-  for (const btn of document.querySelectorAll('.tab-btn')) {
-    btn.classList.toggle('active', btn.dataset.route === route);
-  }
+  if (!state.me && route !== "auth" && route !== "onboarding") route = "auth";
+  for (const btn of document.querySelectorAll('.tab-btn')) btn.classList.toggle('active', btn.dataset.route === route);
   if (route === "onboarding") renderOnboarding();
   else if (route === "home") renderHome();
   else if (route === "search") renderSearch();
@@ -321,9 +399,7 @@ function setRoute(route) {
 }
 
 function bindTabs() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => setRoute(btn.dataset.route));
-  });
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => setRoute(btn.dataset.route)));
 }
 
 // Views
@@ -331,7 +407,6 @@ function renderOnboarding() {
   const me = state.me;
   const levels = ["Débutant", "Intermédiaire", "Avancé", "Compétition"];
   const goals = ["Force", "Hypertrophie", "Perte de poids", "Endurance"];
-  const gyms = state.gyms;
 
   viewRoot().innerHTML = `
     <div class="section">
@@ -357,20 +432,28 @@ function renderOnboarding() {
         </div>
       </div>
       <div>
-        <label>Région / Département</label>
-        <div class="grid cols-2">
-          <select id="onb-region" class="input"></select>
-          <select id="onb-dept" class="input"></select>
-        </div>
-      </div>
-      <div>
-        <label>Salle(s) favorites</label>
-        <select id="gym-select" class="input" multiple size="5">
-          ${gyms.map(g=>`<option value="${g.id}" ${me?.favorites?.includes(g.id)?'selected':''}>${g.name} — ${g.city}</option>`).join('')}
-        </select>
-        <div class="row" style="margin-top:8px">
-          <button id="geoloc" class="btn chip">Autour de moi</button>
-          <button id="add-gym" class="btn chip">Ma salle n'est pas dans la liste</button>
+        <label>Sélection de salle</label>
+        <div class="grid cols-2" style="align-items:end">
+          <div>
+            <label>Marque</label>
+            <select id="onb-chain" class="input"></select>
+          </div>
+          <div>
+            <label>Région</label>
+            <select id="onb-region" class="input"></select>
+          </div>
+          <div>
+            <label>Département</label>
+            <select id="onb-dept" class="input"></select>
+          </div>
+          <div>
+            <label>Ville</label>
+            <select id="onb-city" class="input"></select>
+          </div>
+          <div style="grid-column: 1 / -1">
+            <label>Salles favorites</label>
+            <select id="onb-gym" class="input" multiple size="6"></select>
+          </div>
         </div>
       </div>
       <div>
@@ -383,7 +466,7 @@ function renderOnboarding() {
     </div>
   `;
 
-  setupRegionDept('onb-region', 'onb-dept', me?.regionCode, me?.departmentCode);
+  setupGymCascade('onb', { multipleGyms: true, initial: { chainId: '', regionCode: me?.regionCode, departmentCode: me?.departmentCode, city: me?.city, gymIds: me?.favorites || [] } });
 
   document.getElementById('level-choices').addEventListener('click', (e) => {
     const item = e.target.closest('.choice'); if (!item) return;
@@ -399,11 +482,12 @@ function renderOnboarding() {
     const name = document.getElementById('name').value.trim() || 'Moi';
     const level = parseInt(document.querySelector('#level-choices .choice.active')?.dataset.val ?? '1');
     const goal = document.querySelector('#goal-choices .choice.active')?.dataset.val ?? 'Hypertrophie';
-    const favorites = Array.from(document.getElementById('gym-select').selectedOptions).map(o=>o.value);
+    const favorites = Array.from(document.getElementById('onb-gym').selectedOptions).map(o=>o.value);
     const bio = document.getElementById('bio').value.trim();
     const regionCode = document.getElementById('onb-region').value || null;
     const departmentCode = document.getElementById('onb-dept').value || null;
-    state.me = { ...state.me, name, level, goal, favorites, bio, regionCode, departmentCode };
+    const city = document.getElementById('onb-city').value || null;
+    state.me = { ...state.me, name, level, goal, favorites, bio, regionCode, departmentCode, city };
     syncAccountWithMe();
     saveState();
     showToast('Profil enregistré');
@@ -414,7 +498,6 @@ function renderOnboarding() {
 function renderHome() {
   const recos = getRecommendations(20);
   const listMode = state.ui.listMode;
-  // Build static header
   viewRoot().innerHTML = `
     <div class="section row space-between">
       <div class="h1">Matching</div>
@@ -422,38 +505,19 @@ function renderHome() {
     </div>
     <div id="match-container"></div>
   `;
-  document.getElementById('toggle-mode').addEventListener('click', () => {
-    state.ui.listMode = !state.ui.listMode; saveState(); renderHome();
-  });
-
+  document.getElementById('toggle-mode').addEventListener('click', () => { state.ui.listMode = !state.ui.listMode; saveState(); renderHome(); });
   const container = document.getElementById('match-container');
   if (listMode) {
     container.innerHTML = renderList(recos);
-    // Bind list actions (home)
     container.querySelectorAll('[data-like]').forEach(btn => btn.addEventListener('click', () => {
       const uid = btn.getAttribute('data-like');
       state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: uid, decision: 'like', createdAt: Date.now() });
-      // Create a chance for instant match for demo
-      if (Math.random() < 0.25) {
-        state.matches.push({ id: `m_${Date.now()}`, userA: state.me.id, userB: uid, createdAt: Date.now(), active: true });
-        ensureChatForMatch(uid);
-        showToast('Nouveau match !');
-      } else {
-        showToast('Like envoyé');
-      }
-      saveState();
-      renderHome();
+      if (Math.random() < 0.25) { state.matches.push({ id: `m_${Date.now()}`, userA: state.me.id, userB: uid, createdAt: Date.now(), active: true }); ensureChatForMatch(uid); showToast('Nouveau match !'); } else { showToast('Like envoyé'); }
+      saveState(); renderHome();
     }));
-    container.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => {
-      const uid = btn.getAttribute('data-detail');
-      openProfileModal(state.users.find(u=>u.id===uid));
-    }));
+    container.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => { const uid = btn.getAttribute('data-detail'); openProfileModal(state.users.find(u=>u.id===uid)); }));
   } else {
-    // Swipe deck mode
-    const deck = document.createElement('div');
-    deck.className = 'card swipe-deck';
-    container.appendChild(deck);
-    renderSwipeDeckInto(deck, recos);
+    const deck = document.createElement('div'); deck.className = 'card swipe-deck'; container.appendChild(deck); renderSwipeDeckInto(deck, recos);
   }
 }
 
@@ -461,85 +525,24 @@ function renderSwipeDeckInto(root, recos) {
   let index = 0;
   function draw() {
     root.innerHTML = '';
-    if (index >= recos.length) { root.innerHTML = `<div class=\"muted\" style=\"padding:20px\">Plus de recommandations. Revenez plus tard.</div>`; return; }
+    if (index >= recos.length) { root.innerHTML = `<div class="muted" style="padding:20px">Plus de recommandations. Revenez plus tard.</div>`; return; }
     const r = recos[index];
-    const el = document.createElement('div');
-    el.className = 'swipe-card';
-    el.innerHTML = matchCardHTML(r.user, r.score);
-    root.appendChild(el);
-
-    const like = el.querySelector('[data-like]');
-    const pass = el.querySelector('[data-pass]');
-    const detail = el.querySelector('[data-detail]');
-
+    const el = document.createElement('div'); el.className = 'swipe-card'; el.innerHTML = matchCardHTML(r.user, r.score); root.appendChild(el);
+    const like = el.querySelector('[data-like]'); const pass = el.querySelector('[data-pass]'); const detail = el.querySelector('[data-detail]');
     like.addEventListener('click', () => onSwipe(r.user, 'like'));
     pass.addEventListener('click', () => onSwipe(r.user, 'pass'));
     detail.addEventListener('click', () => openProfileModal(r.user));
-
-    // Drag swipe
-    let startX = 0, startY = 0, dragging = false;
-    let currentX = 0, currentY = 0;
-
-    const onPointerDown = (e) => {
-      dragging = true;
-      el.classList.add('dragging');
-      startX = (e.touches ? e.touches[0].clientX : e.clientX);
-      startY = (e.touches ? e.touches[0].clientY : e.clientY);
-    };
-    const onPointerMove = (e) => {
-      if (!dragging) return;
-      const x = (e.touches ? e.touches[0].clientX : e.clientX);
-      const y = (e.touches ? e.touches[0].clientY : e.clientY);
-      currentX = x - startX;
-      currentY = y - startY;
-      const rot = currentX / 20;
-      const opacity = Math.max(0.6, 1 - Math.abs(currentX) / 600);
-      el.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rot}deg)`;
-      el.style.opacity = String(opacity);
-    };
-    const onPointerUp = () => {
-      if (!dragging) return;
-      dragging = false;
-      el.classList.remove('dragging');
-      const threshold = 120; // px
-      if (currentX > threshold) {
-        // like to the right
-        el.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
-        el.style.transform = `translate(500px, ${currentY}px) rotate(24deg)`;
-        el.style.opacity = '0';
-        setTimeout(()=> onSwipe(r.user, 'like'), 200);
-      } else if (currentX < -threshold) {
-        // pass to the left
-        el.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
-        el.style.transform = `translate(-500px, ${currentY}px) rotate(-24deg)`;
-        el.style.opacity = '0';
-        setTimeout(()=> onSwipe(r.user, 'pass'), 200);
-      } else {
-        // reset
-        el.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-        el.style.transform = 'translate(0px, 0px) rotate(0deg)';
-        el.style.opacity = '1';
-      }
-      currentX = 0; currentY = 0;
-    };
-
-    // Bind both mouse and touch
-    el.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
-    el.addEventListener('touchstart', onPointerDown, { passive: true });
-    el.addEventListener('touchmove', onPointerMove, { passive: true });
-    el.addEventListener('touchend', onPointerUp);
+    let startX = 0, startY = 0, dragging = false; let currentX = 0, currentY = 0;
+    const onPointerDown = (e) => { dragging = true; el.classList.add('dragging'); startX = (e.touches ? e.touches[0].clientX : e.clientX); startY = (e.touches ? e.touches[0].clientY : e.clientY); };
+    const onPointerMove = (e) => { if (!dragging) return; const x = (e.touches ? e.touches[0].clientX : e.clientX); const y = (e.touches ? e.touches[0].clientY : e.clientY); currentX = x - startX; currentY = y - startY; const rot = currentX / 20; const opacity = Math.max(0.6, 1 - Math.abs(currentX) / 600); el.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rot}deg)`; el.style.opacity = String(opacity); };
+    const onPointerUp = () => { if (!dragging) return; dragging = false; el.classList.remove('dragging'); const threshold = 120; if (currentX > threshold) { el.style.transition = 'transform 0.25s ease, opacity 0.25s ease'; el.style.transform = `translate(500px, ${currentY}px) rotate(24deg)`; el.style.opacity = '0'; setTimeout(()=> onSwipe(r.user, 'like'), 200); } else if (currentX < -threshold) { el.style.transition = 'transform 0.25s ease, opacity 0.25s ease'; el.style.transform = `translate(-500px, ${currentY}px) rotate(-24deg)`; el.style.opacity = '0'; setTimeout(()=> onSwipe(r.user, 'pass'), 200); } else { el.style.transition = 'transform 0.2s ease, opacity 0.2s ease'; el.style.transform = 'translate(0px, 0px) rotate(0deg)'; el.style.opacity = '1'; } currentX = 0; currentY = 0; };
+    el.addEventListener('mousedown', onPointerDown); window.addEventListener('mousemove', onPointerMove); window.addEventListener('mouseup', onPointerUp);
+    el.addEventListener('touchstart', onPointerDown, { passive: true }); el.addEventListener('touchmove', onPointerMove, { passive: true }); el.addEventListener('touchend', onPointerUp);
   }
   function onSwipe(user, decision) {
     state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: user.id, decision, createdAt: Date.now() });
-    if (decision === 'like' && Math.random() < 0.25) {
-      state.matches.push({ id: `m_${Date.now()}`, userA: state.me.id, userB: user.id, createdAt: Date.now(), active: true });
-      ensureChatForMatch(user.id);
-      showToast('Nouveau match !');
-    }
-    saveState();
-    index += 1; draw();
+    if (decision === 'like' && Math.random() < 0.25) { state.matches.push({ id: `m_${Date.now()}`, userA: state.me.id, userB: user.id, createdAt: Date.now(), active: true }); ensureChatForMatch(user.id); showToast('Nouveau match !'); }
+    saveState(); index += 1; draw();
   }
   draw();
 }
@@ -555,7 +558,7 @@ function renderList(recos) {
               <div style="font-weight:700">${r.user.name}</div>
               <div class="badge">${(r.score*100).toFixed(0)}%</div>
             </div>
-            <div class="muted" style="margin-top:4px">${levelLabel(r.user.level)} • ${r.user.goal}</div>
+            <div class="muted" style="margin-top:4px">${levelLabel(r.user.level)} • ${r.user.goal} • ${r.user.city || ''}</div>
             <div class="pills" style="margin-top:6px">${r.user.favorites.map(fid => gymPill(fid)).join('')}</div>
           </div>
           <div class="grid">
@@ -569,17 +572,10 @@ function renderList(recos) {
 }
 
 function levelLabel(level) { return ["Débutant","Intermédiaire","Avancé","Compétition"][level] ?? "Intermédiaire"; }
-function gymPill(gymId) {
-  const g = state.gyms.find(x => x.id === gymId); if (!g) return '';
-  return `<span class="badge">${g.name.split(' ')[0]} • ${g.city}</span>`;
-}
+function gymPill(gymId) { const g = state.gyms.find(x => x.id === gymId); if (!g) return ''; return `<span class="badge">${g.name.split(' ')[0]} • ${g.city}</span>`; }
 
 function matchCardHTML(user, score) {
-  const pills = [
-    `<span class="badge">${levelLabel(user.level)}</span>`,
-    `<span class="badge">${user.goal}</span>`,
-    ...user.favorites.map(fid => gymPill(fid))
-  ].join('');
+  const pills = [`<span class=\"badge\">${levelLabel(user.level)}</span>`, `<span class=\"badge\">${user.goal}</span>`, ...user.favorites.map(fid => gymPill(fid))].join('');
   return `
     <div class="match-card">
       <img class="match-photo" src="${user.photoUrl}" alt="${user.name}" />
@@ -617,36 +613,23 @@ function openProfileModal(user) {
       </div>
     </div>
   `;
-  const container = document.createElement('div');
-  container.innerHTML = html;
-  document.body.appendChild(container);
+  const container = document.createElement('div'); container.innerHTML = html; document.body.appendChild(container);
   document.getElementById('close-modal').onclick = () => container.remove();
-  document.getElementById('like-from-modal').onclick = () => {
-    state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: user.id, decision: 'like', createdAt: Date.now() });
-    saveState(); showToast('Like envoyé');
-  };
+  document.getElementById('like-from-modal').onclick = () => { state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: user.id, decision: 'like', createdAt: Date.now() }); saveState(); showToast('Like envoyé'); };
   document.getElementById('message-user').onclick = () => { startChatWith(user); container.remove(); };
   document.getElementById('propose-session').onclick = () => { ensureChatForMatch(user.id); openPlanner(user); };
 }
 
 function ensureChatForMatch(userId) {
-  // create or find match and chat
   let match = state.matches.find(m => (m.userA===state.me.id && m.userB===userId) || (m.userB===state.me.id && m.userA===userId));
-  if (!match) {
-    match = { id: `m_${Date.now()}`, userA: state.me.id, userB: userId, createdAt: Date.now(), active: true };
-    state.matches.push(match);
-  }
+  if (!match) { match = { id: `m_${Date.now()}`, userA: state.me.id, userB: userId, createdAt: Date.now(), active: true }; state.matches.push(match); }
   let chat = state.chats.find(c => c.matchId === match.id);
-  if (!chat) {
-    chat = { id: `c_${Date.now()}`, matchId: match.id };
-    state.chats.push(chat);
-  }
+  if (!chat) { chat = { id: `c_${Date.now()}`, matchId: match.id }; state.chats.push(chat); }
   saveState();
   return chat;
 }
 
 function renderSearch() {
-  const gyms = state.gyms;
   viewRoot().innerHTML = `
     <div class="section h1">Recherche / Filtres</div>
     <div class="card grid">
@@ -662,27 +645,35 @@ function renderSearch() {
           </select>
         </div>
         <div>
-          <label>Salle</label>
-          <select id="f-gym" class="input">
-            <option value="">Toutes</option>
-            ${gyms.map(g=>`<option value="${g.id}">${g.name} — ${g.city}</option>`).join('')}
-          </select>
-        </div>
-        <div>
           <label>Jour</label>
           <select id="f-day" class="input">
             ${["Tous","Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].map((d,i)=>`<option value="${i-1}">${d}</option>`).join('')}
           </select>
         </div>
       </div>
-      <div class="grid cols-2">
-        <div>
-          <label>Région</label>
-          <select id="f-region" class="input"></select>
-        </div>
-        <div>
-          <label>Département</label>
-          <select id="f-dept" class="input"></select>
+      <div>
+        <label>Salle</label>
+        <div class="grid cols-2" style="align-items:end">
+          <div>
+            <label>Marque</label>
+            <select id="f-chain" class="input"></select>
+          </div>
+          <div>
+            <label>Région</label>
+            <select id="f-region" class="input"></select>
+          </div>
+          <div>
+            <label>Département</label>
+            <select id="f-dept" class="input"></select>
+          </div>
+          <div>
+            <label>Ville</label>
+            <select id="f-city" class="input"></select>
+          </div>
+          <div>
+            <label>Salle</label>
+            <select id="f-gym" class="input"></select>
+          </div>
         </div>
       </div>
       <div>
@@ -692,19 +683,23 @@ function renderSearch() {
     <div id="results"></div>
   `;
 
-  setupRegionDept('f-region', 'f-dept', '', '');
+  setupGymCascade('f', { multipleGyms: false, initial: {} });
 
   document.getElementById('apply-filters').addEventListener('click', () => {
     const level = document.getElementById('f-level').value;
-    const gym = document.getElementById('f-gym').value;
     const day = parseInt(document.getElementById('f-day').value);
+    const chainId = document.getElementById('f-chain').value;
     const regionCode = document.getElementById('f-region').value;
     const departmentCode = document.getElementById('f-dept').value;
+    const city = document.getElementById('f-city').value;
+    const gymId = document.getElementById('f-gym').value;
     const items = state.users.filter(u => {
       if (level !== '' && parseInt(level) !== u.level) return false;
-      if (gym && !u.favorites.includes(gym)) return false;
+      if (chainId && !state.gyms.some(g => u.favorites.includes(g.id) && g.chainId === chainId)) return false;
       if (regionCode && u.regionCode !== regionCode) return false;
       if (departmentCode && u.departmentCode !== departmentCode) return false;
+      if (city && u.city !== city) return false;
+      if (gymId && !u.favorites.includes(gymId)) return false;
       if (day >= 0) {
         const bits = base64ToBits(u.availabilityMask);
         const hasDay = bits.slice(day*48, (day+1)*48).some(b=>b===1);
@@ -714,26 +709,14 @@ function renderSearch() {
     }).map(u => ({ user: u, score: matchScore(state.me, u) }))
       .sort((a,b)=>b.score-a.score);
     document.getElementById('results').innerHTML = renderList(items);
-    // bind list actions
-    document.querySelectorAll('[data-like]').forEach(btn => btn.addEventListener('click', () => {
-      const uid = btn.getAttribute('data-like');
-      state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: uid, decision: 'like', createdAt: Date.now() });
-      saveState(); showToast('Like envoyé');
-    }));
-    document.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => {
-      const uid = btn.getAttribute('data-detail');
-      openProfileModal(state.users.find(u=>u.id===uid));
-    }));
+    document.querySelectorAll('[data-like]').forEach(btn => btn.addEventListener('click', () => { const uid = btn.getAttribute('data-like'); state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: uid, decision: 'like', createdAt: Date.now() }); saveState(); showToast('Like envoyé'); }));
+    document.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => { const uid = btn.getAttribute('data-detail'); openProfileModal(state.users.find(u=>u.id===uid)); }));
   });
 }
 
 function renderChat() {
   const myMatches = state.matches.filter(m => m.active && (m.userA===state.me.id || m.userB===state.me.id));
-  const items = myMatches.map(m => {
-    const partnerId = m.userA===state.me.id ? m.userB : m.userA;
-    const partner = state.users.find(u => u.id === partnerId) || state.me;
-    return { match: m, partner };
-  });
+  const items = myMatches.map(m => { const partnerId = m.userA===state.me.id ? m.userB : m.userA; const partner = state.users.find(u => u.id === partnerId) || state.me; return { match: m, partner }; });
   viewRoot().innerHTML = `
     <div class="section h1">Chat</div>
     <div class="card chat-list">
@@ -759,7 +742,6 @@ function openChatRoom(matchId) {
   const partner = state.users.find(u => u.id === partnerId);
   if (!partner) return;
   if (!match.messages) match.messages = [];
-
   document.getElementById('chat-room').innerHTML = `
     <div class="card">
       <div class="row space-between">
@@ -784,23 +766,16 @@ function openChatRoom(matchId) {
   `;
   const msgs = document.getElementById('msgs');
   document.getElementById('send-msg').onclick = () => {
-    const text = document.getElementById('msg-input').value.trim();
-    if (!text) return;
+    const text = document.getElementById('msg-input').value.trim(); if (!text) return;
     match.messages.push({ id: `msg_${Date.now()}`, chatId: match.id, senderId: state.me.id, text, type: 'text', createdAt: Date.now() });
-    saveState();
-    openChatRoom(matchId);
-    setTimeout(()=> msgs.scrollTop = msgs.scrollHeight, 0);
+    saveState(); openChatRoom(matchId); setTimeout(()=> msgs.scrollTop = msgs.scrollHeight, 0);
   };
   document.getElementById('btn-plan').onclick = () => openPlanner(partner);
 }
 
 function openPlanner(partner) {
-  // Find common gyms and time suggestions based on availability overlap
-  const myGyms = state.me.favorites;
-  const partnerGyms = partner.favorites;
-  const commonGyms = myGyms.filter(g => partnerGyms.includes(g));
+  const myGyms = state.me.favorites; const partnerGyms = partner.favorites; const commonGyms = myGyms.filter(g => partnerGyms.includes(g));
   const suggestions = suggestSessions(state.me, partner, commonGyms);
-
   const html = `
     <div class="card" style="position:fixed; inset: 6% 6% auto 6%; z-index: 30; background: var(--bg-2)">
       <div class="row space-between">
@@ -823,83 +798,36 @@ function openPlanner(partner) {
       </div>
     </div>
   `;
-  const container = document.createElement('div');
-  container.innerHTML = html;
-  document.body.appendChild(container);
+  const container = document.createElement('div'); container.innerHTML = html; document.body.appendChild(container);
   document.getElementById('close-planner').onclick = () => container.remove();
   container.querySelectorAll('[data-ics]').forEach(btn => btn.addEventListener('click', () => {
-    const [gymId, startIso] = btn.getAttribute('data-ics').split('|');
-    const start = new Date(startIso); const end = new Date(start.getTime()+90*60000);
-    const gym = state.gyms.find(g=>g.id===gymId);
-    downloadICS({
-      title: `Séance à ${gym.name}`,
-      description: `Séance proposée avec ${partner.name}`,
-      location: `${gym.name}, ${gym.city}`,
-      start,
-      end,
-    });
+    const [gymId, startIso] = btn.getAttribute('data-ics').split('|'); const start = new Date(startIso); const end = new Date(start.getTime()+90*60000); const gym = state.gyms.find(g=>g.id===gymId);
+    downloadICS({ title: `Séance à ${gym.name}`, description: `Séance proposée avec ${partner.name}`, location: `${gym.name}, ${gym.city}`, start, end });
   }));
-  container.querySelectorAll('[data-propose]').forEach(btn => btn.addEventListener('click', () => {
-    const [gymId, startIso] = btn.getAttribute('data-propose').split('|');
-    proposeSession(partner, gymId, new Date(startIso));
-    container.remove();
-  }));
+  container.querySelectorAll('[data-propose]').forEach(btn => btn.addEventListener('click', () => { const [gymId, startIso] = btn.getAttribute('data-propose').split('|'); proposeSession(partner, gymId, new Date(startIso)); container.remove(); }));
 }
 
 function suggestSessions(a, b, gymIds) {
-  // find the next 7 days half-hour slots where both have availability
-  const bitsA = base64ToBits(a.availabilityMask);
-  const bitsB = base64ToBits(b.availabilityMask);
-  const now = new Date();
-  const suggestions = [];
+  const bitsA = base64ToBits(a.availabilityMask); const bitsB = base64ToBits(b.availabilityMask); const now = new Date(); const suggestions = [];
   for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate()+dayOffset);
-    const weekday = (date.getDay() + 6) % 7; // 0=Mon
-    for (let slot = 16; slot < 40; slot+=2) { // prefer 8:00 to 20:00, step 1h
+    const weekday = (date.getDay() + 6) % 7;
+    for (let slot = 16; slot < 40; slot+=2) {
       const idx = weekday*48 + slot;
-      if (bitsA[idx] && bitsB[idx]) {
-        const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), Math.floor(slot/2), (slot%2)*30);
-        suggestions.push({ gymId: gymIds[0] ?? a.favorites[0], start });
-      }
+      if (bitsA[idx] && bitsB[idx]) { const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), Math.floor(slot/2), (slot%2)*30); suggestions.push({ gymId: gymIds[0] ?? a.favorites[0], start }); }
     }
     if (suggestions.length >= 5) break;
   }
   return suggestions;
 }
 
-function formatSlot(dt) {
-  const days = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
-  return `${days[(dt.getDay()+6)%7]} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')} ${dt.toLocaleDateString()}`;
-}
+function formatSlot(dt) { const days = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"]; return `${days[(dt.getDay()+6)%7]} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')} ${dt.toLocaleDateString()}`; }
 
 function downloadICS({ title, description, location, start, end }) {
-  // Basic ICS
-  function formatICSDate(d) {
-    const pad = (n)=>String(n).padStart(2,'0');
-    return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
-  }
+  function formatICSDate(d) { const pad = (n)=>String(n).padStart(2,'0'); return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`; }
   const uid = `sess-${Date.now()}@gym-buddy`;
-  const ics = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Gym Buddy Proto//FR',
-    'CALSCALE:GREGORIAN',
-    'BEGIN:VEVENT',
-    `UID:${uid}`,
-    `DTSTAMP:${formatICSDate(new Date())}`,
-    `DTSTART:${formatICSDate(start)}`,
-    `DTEND:${formatICSDate(end)}`,
-    `SUMMARY:${title}`,
-    `DESCRIPTION:${description}`,
-    `LOCATION:${location}`,
-    'END:VEVENT',
-    'END:VCALENDAR'
-  ].join('\r\n');
-  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'seance.ics'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Gym Buddy Proto//FR','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${uid}`,`DTSTAMP:${formatICSDate(new Date())}`,`DTSTART:${formatICSDate(start)}`,`DTEND:${formatICSDate(end)}`,`SUMMARY:${title}`,`DESCRIPTION:${description}`,`LOCATION:${location}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'seance.ics'; a.click(); setTimeout(()=>URL.revokeObjectURL(url), 1000);
 }
 
 function renderProfile() {
@@ -932,10 +860,20 @@ function renderProfile() {
           </div>
         </div>
         <div>
-          <label>Région / Département</label>
+          <label>Localisation</label>
           <div class="grid cols-2">
             <select id="me-region" class="input"></select>
             <select id="me-dept" class="input"></select>
+          </div>
+          <div style="margin-top:8px">
+            <select id="me-city" class="input"></select>
+          </div>
+        </div>
+        <div>
+          <label>Salles favorites</label>
+          <div class="grid cols-2" style="align-items:end">
+            <select id="me-chain" class="input"></select>
+            <select id="me-gym" class="input" multiple size="6"></select>
           </div>
         </div>
         <div>
@@ -950,75 +888,46 @@ function renderProfile() {
       </div>
     </div>
   `;
+  // Setup cascades
   setupRegionDept('me-region', 'me-dept', me.regionCode, me.departmentCode);
+  const meCitySel = document.getElementById('me-city');
+  const refreshMeCities = () => {
+    const cities = getCitiesFor(document.getElementById('me-region').value || '', document.getElementById('me-dept').value || '', '');
+    meCitySel.innerHTML = `<option value="">Ville</option>` + cities.map(c=>`<option value="${c}">${c}</option>`).join('');
+    meCitySel.value = me.city || '';
+  };
+  document.getElementById('me-region').addEventListener('change', () => { me.city = ''; refreshMeCities(); });
+  document.getElementById('me-dept').addEventListener('change', () => { me.city = ''; refreshMeCities(); });
+  refreshMeCities();
+  setupGymCascade('me', { multipleGyms: true, initial: { chainId: '', regionCode: me.regionCode, departmentCode: me.departmentCode, city: me.city, gymIds: me.favorites } });
+
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;
     state.me.bio = document.getElementById('me-bio').value.trim();
     state.me.regionCode = document.getElementById('me-region').value || null;
     state.me.departmentCode = document.getElementById('me-dept').value || null;
+    state.me.city = document.getElementById('me-city').value || null;
+    state.me.favorites = Array.from(document.getElementById('me-gym').selectedOptions).map(o=>o.value);
     syncAccountWithMe(); saveState(); showToast('Profil mis à jour');
   };
-  document.getElementById('reset').onclick = () => {
-    localStorage.removeItem(STORAGE_KEY); state = seed(); saveState(); setRoute('home'); showToast('Réinitialisé');
-  };
-  document.getElementById('logout').onclick = () => {
-    state.me = null; state.auth = { currentUserId: null }; saveState(); setRoute('auth');
-  };
+  document.getElementById('reset').onclick = () => { localStorage.removeItem(STORAGE_KEY); state = seed(); saveState(); setRoute('home'); showToast('Réinitialisé'); };
+  document.getElementById('logout').onclick = () => { state.me = null; state.auth = { currentUserId: null }; saveState(); setRoute('auth'); };
   const fileInput = document.getElementById('me-photo-file');
-  fileInput?.addEventListener('change', (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      state.me.photoUrl = String(reader.result);
-      syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour');
-    };
-    reader.readAsDataURL(file);
-  });
-  document.getElementById('apply-photo-url')?.addEventListener('click', () => {
-    const url = document.getElementById('me-photo-url').value.trim();
-    if (!url) return;
-    state.me.photoUrl = url; syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour');
-  });
-}
-
-function proposeSession(partner, gymId, start) {
-  const match = state.matches.find(m => (m.userA===state.me.id && m.userB===partner.id) || (m.userB===state.me.id && m.userA===partner.id));
-  const gym = state.gyms.find(g=>g.id===gymId);
-  const end = new Date(start.getTime()+90*60000);
-  if (match) {
-    if (!match.messages) match.messages = [];
-    match.messages.push({ id: `msg_${Date.now()}`, chatId: match.id, senderId: state.me.id, type: 'session_proposal', text: `Proposition de séance: ${gym.name} le ${formatSlot(start)} (90 min)`, createdAt: Date.now() });
-    saveState();
-    setRoute('chat');
-    showToast('Séance proposée');
-  }
+  fileInput?.addEventListener('change', (e) => { const file = e.target.files && e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { state.me.photoUrl = String(reader.result); syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour'); }; reader.readAsDataURL(file); });
+  document.getElementById('apply-photo-url')?.addEventListener('click', () => { const url = document.getElementById('me-photo-url').value.trim(); if (!url) return; state.me.photoUrl = url; syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour'); });
 }
 
 function startChatWith(user) {
   ensureChatForMatch(user.id);
   setRoute('chat');
-  // open the chat room directly
   const match = state.matches.find(m => (m.userA===state.me.id && m.userB===user.id) || (m.userB===state.me.id && m.userA===user.id));
-  if (match) {
-    // Defer until chat view renders, then open
-    setTimeout(()=> {
-      const openBtn = document.querySelector(`[data-open-chat="${match.id}"]`);
-      openBtn?.click();
-    }, 0);
-  }
+  if (match) setTimeout(()=> { document.querySelector(`[data-open-chat="${match.id}"]`)?.click(); }, 0);
 }
 
-// Initial render and bindings
-function init() {
-  bindTabs();
-  if (state.auth?.currentUserId && !state.me) setLoggedInUserById(state.auth.currentUserId);
-  if (!state.me) setRoute('auth'); else setRoute('home');
-}
-
+// Initial render and Auth view remain unchanged
+function init() { bindTabs(); if (state.auth?.currentUserId && !state.me) setLoggedInUserById(state.auth.currentUserId); if (!state.me) setRoute('auth'); else setRoute('home'); }
 window.addEventListener('DOMContentLoaded', init);
 
-// Auth view
 function renderAuth() {
   viewRoot().innerHTML = `
     <div class="section h1">Compte</div>
@@ -1029,31 +938,16 @@ function renderAuth() {
       </div>
       <div id="auth-forms" class="grid">
         <div id="login-form" class="grid">
-          <div>
-            <label>Email</label>
-            <input id="login-email" class="input" type="email" placeholder="vous@example.com" />
-          </div>
-          <div>
-            <label>Mot de passe</label>
-            <input id="login-pass" class="input" type="password" placeholder="Votre mot de passe" />
-          </div>
+          <div><label>Email</label><input id="login-email" class="input" type="email" placeholder="vous@example.com" /></div>
+          <div><label>Mot de passe</label><input id="login-pass" class="input" type="password" placeholder="Votre mot de passe" /></div>
           <button id="btn-login" class="btn primary">Se connecter</button>
         </div>
         <div id="signup-form" class="grid" style="display:none">
+          <div><label>Prénom</label><input id="su-name" class="input" placeholder="Votre prénom" /></div>
+          <div><label>Email</label><input id="su-email" class="input" type="email" placeholder="vous@example.com" /></div>
+          <div><label>Mot de passe</label><input id="su-pass" class="input" type="password" placeholder="Mot de passe" /></div>
           <div>
-            <label>Prénom</label>
-            <input id="su-name" class="input" placeholder="Votre prénom" />
-          </div>
-          <div>
-            <label>Email</label>
-            <input id="su-email" class="input" type="email" placeholder="vous@example.com" />
-          </div>
-          <div>
-            <label>Mot de passe</label>
-            <input id="su-pass" class="input" type="password" placeholder="Mot de passe" />
-          </div>
-          <div>
-            <label>Région / Département</label>
+            <label>Localisation</label>
             <div class="grid cols-2">
               <select id="su-region" class="input"></select>
               <select id="su-dept" class="input"></select>
@@ -1064,54 +958,11 @@ function renderAuth() {
       </div>
     </div>
   `;
-  const loginTab = document.getElementById('tab-login');
-  const signupTab = document.getElementById('tab-signup');
-  const loginForm = document.getElementById('login-form');
-  const signupForm = document.getElementById('signup-form');
+  const loginTab = document.getElementById('tab-login'); const signupTab = document.getElementById('tab-signup'); const loginForm = document.getElementById('login-form'); const signupForm = document.getElementById('signup-form');
   const showLogin = () => { loginForm.style.display = 'grid'; signupForm.style.display = 'none'; };
   const showSignup = () => { loginForm.style.display = 'none'; signupForm.style.display = 'grid'; };
-  loginTab.onclick = showLogin; signupTab.onclick = showSignup;
-  showLogin();
-
+  loginTab.onclick = showLogin; signupTab.onclick = showSignup; showLogin();
   setupRegionDept('su-region', 'su-dept', '', '');
-
-  document.getElementById('btn-login').onclick = () => {
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    const pass = document.getElementById('login-pass').value;
-    const acct = state.accounts.find(a => (a.email||'').toLowerCase() === email && a.password === pass);
-    if (!acct) { showToast('Identifiants invalides'); return; }
-    setLoggedInUserById(acct.id);
-    showToast('Connecté');
-    setRoute('home');
-  };
-  document.getElementById('btn-signup').onclick = () => {
-    const name = document.getElementById('su-name').value.trim();
-    const email = document.getElementById('su-email').value.trim().toLowerCase();
-    const pass = document.getElementById('su-pass').value;
-    const regionCode = document.getElementById('su-region').value || null;
-    const departmentCode = document.getElementById('su-dept').value || null;
-    if (!name || !email || !pass) { showToast('Complétez tous les champs'); return; }
-    if (state.accounts.some(a => (a.email||'').toLowerCase() === email)) { showToast('Email déjà utilisé'); return; }
-    const id = `acc_${Date.now()}`;
-    const account = {
-      id,
-      name,
-      email,
-      password: pass,
-      photoUrl: avatar(name),
-      level: 1,
-      goal: 'Hypertrophie',
-      favorites: [state.gyms[0]?.id].filter(Boolean),
-      availabilityMask: generateRandomWeekMask(0.3),
-      bio: '',
-      regionCode,
-      departmentCode,
-    };
-    state.accounts.push(account);
-    state.me = { ...account };
-    state.auth = { currentUserId: id };
-    saveState();
-    showToast('Compte créé');
-    setRoute('onboarding');
-  };
+  document.getElementById('btn-login').onclick = () => { const email = document.getElementById('login-email').value.trim().toLowerCase(); const pass = document.getElementById('login-pass').value; const acct = state.accounts.find(a => (a.email||'').toLowerCase() === email && a.password === pass); if (!acct) { showToast('Identifiants invalides'); return; } setLoggedInUserById(acct.id); showToast('Connecté'); setRoute('home'); };
+  document.getElementById('btn-signup').onclick = () => { const name = document.getElementById('su-name').value.trim(); const email = document.getElementById('su-email').value.trim().toLowerCase(); const pass = document.getElementById('su-pass').value; const regionCode = document.getElementById('su-region').value || null; const departmentCode = document.getElementById('su-dept').value || null; if (!name || !email || !pass) { showToast('Complétez tous les champs'); return; } if (state.accounts.some(a => (a.email||'').toLowerCase() === email)) { showToast('Email déjà utilisé'); return; } const id = `acc_${Date.now()}`; const account = { id, name, email, password: pass, photoUrl: avatar(name), level: 1, goal: 'Hypertrophie', favorites: [], availabilityMask: generateRandomWeekMask(0.3), bio: '', regionCode, departmentCode, city: null }; state.accounts.push(account); state.me = { ...account }; state.auth = { currentUserId: id }; saveState(); showToast('Compte créé'); setRoute('onboarding'); };
 }
