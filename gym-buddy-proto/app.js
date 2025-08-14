@@ -20,7 +20,7 @@ const defaultState = {
   swipes: [],
   chats: [],
   matches: [],
-  ui: { listMode: false },
+  ui: { listMode: false, profileEdit: false },
   accounts: [],
   auth: { currentUserId: null },
 };
@@ -374,6 +374,9 @@ function calculateAge(iso) {
 function ageLabel(user) {
   const a = calculateAge(user?.birthDate);
   return a != null ? `${a} ans` : "Âge —";
+}
+function normalizeText(s) {
+  return (s || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
 // Availability bitmask helpers (7 days x 48 half-hours = 336 bits)
@@ -741,6 +744,10 @@ function renderSearch() {
             ${["Tous","Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].map((d,i)=>`<option value="${i-1}">${d}</option>`).join('')}
           </select>
         </div>
+        <div>
+          <label>Précision (quartier, rue...)</label>
+          <input id="f-precision" class="input" placeholder="Ex: République, Bellecour, Joliette..." />
+        </div>
       </div>
       <div>
         <label>Salle</label>
@@ -761,10 +768,6 @@ function renderSearch() {
             <label>Ville</label>
             <select id="f-city" class="input"></select>
           </div>
-          <div>
-            <label>Salle</label>
-            <select id="f-gym" class="input"></select>
-          </div>
         </div>
       </div>
       <div>
@@ -774,7 +777,10 @@ function renderSearch() {
     <div id="results"></div>
   `;
 
-  setupGymCascade('f', { multipleGyms: false, initial: {} });
+  // Fill chain and geo (without specific gym dropdown)
+  const chainSel = document.getElementById('f-chain');
+  chainSel.innerHTML = `<option value="">Toutes marques</option>` + state.gymChains.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  setupGeoCascade('f', { initial: {}, onChange: ()=>{} });
 
   document.getElementById('apply-filters').addEventListener('click', () => {
     const level = document.getElementById('f-level').value;
@@ -783,14 +789,20 @@ function renderSearch() {
     const regionCode = document.getElementById('f-region').value;
     const departmentCode = document.getElementById('f-dept').value;
     const city = document.getElementById('f-city').value;
-    const gymId = document.getElementById('f-gym').value;
+    const precision = normalizeText(document.getElementById('f-precision').value);
     const items = state.users.filter(u => {
       if (level !== '' && parseInt(level) !== u.level) return false;
-      if (chainId && !state.gyms.some(g => u.favorites.includes(g.id) && g.chainId === chainId)) return false;
       if (regionCode && u.regionCode !== regionCode) return false;
       if (departmentCode && u.departmentCode !== departmentCode) return false;
       if (city && u.city !== city) return false;
-      if (gymId && !u.favorites.includes(gymId)) return false;
+      if (chainId) {
+        const hasChain = state.gyms.some(g => u.favorites.includes(g.id) && g.chainId === chainId);
+        if (!hasChain) return false;
+      }
+      if (precision) {
+        const ok = state.gyms.some(g => u.favorites.includes(g.id) && normalizeText(`${g.name} ${g.city}`).includes(precision));
+        if (!ok) return false;
+      }
       if (day >= 0) {
         const bits = base64ToBits(u.availabilityMask);
         const hasDay = bits.slice(day*48, (day+1)*48).some(b=>b===1);
@@ -923,6 +935,7 @@ function downloadICS({ title, description, location, start, end }) {
 
 function renderProfile() {
   const me = state.me;
+  const edit = state.ui?.profileEdit ?? false;
   const pills = [ `<span class="badge">${levelLabel(me.level)}</span>`, `<span class="badge">${me.goal}</span>`, `<span class="badge">${ageLabel(me)}</span>`, ...me.favorites.map(gymPill) ].join('');
   viewRoot().innerHTML = `
     <div class="section h1">Mon profil</div>
@@ -939,6 +952,9 @@ function renderProfile() {
         <div class="pills">${pills}</div>
       </div>
       <div class="grid">
+        <div class="row" style="gap:8px; justify-content:flex-end">
+          <button id="toggle-edit" class="btn chip">${edit ? 'Terminer' : 'Modifier'}</button>
+        </div>
         <div>
           <label>Nom</label>
           <input id="me-name" class="input" value="${me.name}" />
@@ -979,7 +995,7 @@ function renderProfile() {
           <textarea id="me-bio" rows="4" class="input">${me.bio ?? ''}</textarea>
         </div>
         <div class="row" style="gap:8px">
-          <button id="save-me" class="btn primary">Enregistrer</button>
+          <button id="save-me" class="btn primary" style="display:${edit ? 'inline-block':'none'}">Enregistrer</button>
           <button id="reset" class="btn">Réinitialiser</button>
           <button id="logout" class="btn">Déconnexion</button>
         </div>
@@ -987,6 +1003,11 @@ function renderProfile() {
     </div>
   `;
   setupGymCascade('me', { multipleGyms: true, initial: { regionCode: me.regionCode, departmentCode: me.departmentCode, city: me.city, gymIds: me.favorites } });
+  // Toggle edit mode
+  document.getElementById('toggle-edit').onclick = () => { state.ui.profileEdit = !edit; saveState(); renderProfile(); };
+  // Disable/enable fields based on edit mode
+  const ids = ['me-name','me-birth','me-photo-file','me-photo-url','apply-photo-url','me-region','me-dept','me-city','me-chain','me-gym','me-bio'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = !edit; });
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;
     state.me.birthDate = document.getElementById('me-birth').value || null;
@@ -995,13 +1016,13 @@ function renderProfile() {
     state.me.departmentCode = document.getElementById('me-dept').value || null;
     state.me.city = document.getElementById('me-city').value || null;
     state.me.favorites = Array.from(document.getElementById('me-gym').selectedOptions).map(o=>o.value);
-    syncAccountWithMe(); saveState(); showToast('Profil mis à jour');
+    syncAccountWithMe(); saveState(); showToast('Profil mis à jour'); state.ui.profileEdit = false; saveState(); renderProfile();
   };
   document.getElementById('reset').onclick = () => { localStorage.removeItem(STORAGE_KEY); state = seed(); saveState(); setRoute('home'); showToast('Réinitialisé'); };
   document.getElementById('logout').onclick = () => { state.me = null; state.auth = { currentUserId: null }; saveState(); setRoute('auth'); };
   const fileInput = document.getElementById('me-photo-file');
-  fileInput?.addEventListener('change', (e) => { const file = e.target.files && e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { state.me.photoUrl = String(reader.result); syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour'); }; reader.readAsDataURL(file); });
-  document.getElementById('apply-photo-url')?.addEventListener('click', () => { const url = document.getElementById('me-photo-url').value.trim(); if (!url) return; state.me.photoUrl = url; syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour'); });
+  fileInput?.addEventListener('change', (e) => { if (!edit) return; const file = e.target.files && e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { state.me.photoUrl = String(reader.result); syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour'); }; reader.readAsDataURL(file); });
+  document.getElementById('apply-photo-url')?.addEventListener('click', () => { if (!edit) return; const url = document.getElementById('me-photo-url').value.trim(); if (!url) return; state.me.photoUrl = url; syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour'); });
 }
 
 function startChatWith(user) {
