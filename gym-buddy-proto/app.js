@@ -402,6 +402,61 @@ function renderSwipeDeckInto(root, recos) {
     like.addEventListener('click', () => onSwipe(r.user, 'like'));
     pass.addEventListener('click', () => onSwipe(r.user, 'pass'));
     detail.addEventListener('click', () => openProfileModal(r.user));
+
+    // Drag swipe
+    let startX = 0, startY = 0, dragging = false;
+    let currentX = 0, currentY = 0;
+
+    const onPointerDown = (e) => {
+      dragging = true;
+      el.classList.add('dragging');
+      startX = (e.touches ? e.touches[0].clientX : e.clientX);
+      startY = (e.touches ? e.touches[0].clientY : e.clientY);
+    };
+    const onPointerMove = (e) => {
+      if (!dragging) return;
+      const x = (e.touches ? e.touches[0].clientX : e.clientX);
+      const y = (e.touches ? e.touches[0].clientY : e.clientY);
+      currentX = x - startX;
+      currentY = y - startY;
+      const rot = currentX / 20;
+      const opacity = Math.max(0.6, 1 - Math.abs(currentX) / 600);
+      el.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rot}deg)`;
+      el.style.opacity = String(opacity);
+    };
+    const onPointerUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      const threshold = 120; // px
+      if (currentX > threshold) {
+        // like to the right
+        el.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+        el.style.transform = `translate(500px, ${currentY}px) rotate(24deg)`;
+        el.style.opacity = '0';
+        setTimeout(()=> onSwipe(r.user, 'like'), 200);
+      } else if (currentX < -threshold) {
+        // pass to the left
+        el.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+        el.style.transform = `translate(-500px, ${currentY}px) rotate(-24deg)`;
+        el.style.opacity = '0';
+        setTimeout(()=> onSwipe(r.user, 'pass'), 200);
+      } else {
+        // reset
+        el.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+        el.style.transform = 'translate(0px, 0px) rotate(0deg)';
+        el.style.opacity = '1';
+      }
+      currentX = 0; currentY = 0;
+    };
+
+    // Bind both mouse and touch
+    el.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+    el.addEventListener('touchstart', onPointerDown, { passive: true });
+    el.addEventListener('touchmove', onPointerMove, { passive: true });
+    el.addEventListener('touchend', onPointerUp);
   }
   function onSwipe(user, decision) {
     state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: user.id, decision, createdAt: Date.now() });
