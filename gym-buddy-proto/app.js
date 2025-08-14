@@ -398,10 +398,14 @@ function renderSwipeDeckInto(root, recos) {
     const like = el.querySelector('[data-like]');
     const pass = el.querySelector('[data-pass]');
     const detail = el.querySelector('[data-detail]');
+    const msgBtn = el.querySelector('[data-message]');
+    const planBtn = el.querySelector('[data-propose]');
 
     like.addEventListener('click', () => onSwipe(r.user, 'like'));
     pass.addEventListener('click', () => onSwipe(r.user, 'pass'));
     detail.addEventListener('click', () => openProfileModal(r.user));
+    msgBtn.addEventListener('click', () => startChatWith(r.user));
+    planBtn.addEventListener('click', () => { ensureChatForMatch(r.user.id); openPlanner(r.user); });
 
     // Drag swipe
     let startX = 0, startY = 0, dragging = false;
@@ -519,6 +523,10 @@ function matchCardHTML(user, score) {
         <button class="btn danger" data-pass>Pass</button>
         <button class="btn" data-detail>Voir</button>
         <button class="btn success" data-like>Like</button>
+      </div>
+      <div class="actions">
+        <button class="btn" data-message>💬 Message</button>
+        <button class="btn" data-propose>📅 Planifier</button>
       </div>
     </div>
   `;
@@ -893,6 +901,20 @@ function proposeSession(partner, gymId, start) {
     saveState();
     setRoute('chat');
     showToast('Séance proposée');
+  }
+}
+
+function startChatWith(user) {
+  ensureChatForMatch(user.id);
+  setRoute('chat');
+  // open the chat room directly
+  const match = state.matches.find(m => (m.userA===state.me.id && m.userB===user.id) || (m.userB===state.me.id && m.userA===user.id));
+  if (match) {
+    // Defer until chat view renders, then open
+    setTimeout(()=> {
+      const openBtn = document.querySelector(`[data-open-chat="${match.id}"]`);
+      openBtn?.click();
+    }, 0);
   }
 }
 
