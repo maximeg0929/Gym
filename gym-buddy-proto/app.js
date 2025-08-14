@@ -1,5 +1,5 @@
 // Simple SPA router and state
-const routes = ["home", "search", "chat", "profile", "onboarding"];
+const routes = ["home", "search", "chat", "profile", "onboarding", "auth"];
 const viewRoot = () => document.getElementById("view-root");
 const toastEl = () => document.getElementById("toast");
 
@@ -21,11 +21,26 @@ const defaultState = {
   chats: [],
   matches: [],
   ui: { listMode: false },
+  accounts: [],
+  auth: { currentUserId: null },
 };
 
 let state = loadState();
 if (!state || !state.gyms?.length) {
   state = seed();
+  saveState();
+}
+// Migrate older state to support accounts/auth
+if (!state.accounts || !Array.isArray(state.accounts)) {
+  state.accounts = [];
+  if (state.me) {
+    const existing = { ...state.me };
+    if (!existing.email) existing.email = `user${Date.now()}@example.com`;
+    state.accounts.push(existing);
+    state.auth = { currentUserId: existing.id };
+  } else {
+    state.auth = { currentUserId: null };
+  }
   saveState();
 }
 
@@ -36,6 +51,22 @@ function loadState() {
 }
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function setLoggedInUserById(userId) {
+  const acct = state.accounts.find(a => a.id === userId);
+  state.me = acct ? { ...acct } : null;
+  state.auth = { currentUserId: acct ? acct.id : null };
+  saveState();
+}
+
+function syncAccountWithMe() {
+  if (!state.me) return;
+  const idx = state.accounts.findIndex(a => a.id === state.me.id);
+  if (idx >= 0) {
+    state.accounts[idx] = { ...state.accounts[idx], ...state.me };
+    saveState();
+  }
 }
 
 // Seed data: gyms, users
@@ -61,6 +92,7 @@ function seed() {
     favorites: [gyms[0].id, gyms[2].id],
     availabilityMask: generateRandomWeekMask(0.35),
     bio: "Motivé pour progresser en force et hypertrophie. Bench day addict.",
+    email: "alex@example.com",
   };
   return {
     ...structuredClone(defaultState),
@@ -71,6 +103,8 @@ function seed() {
     swipes: [],
     chats: [],
     matches: [],
+    accounts: [ { ...me, password: "demo123" } ],
+    auth: { currentUserId: me.id },
   };
 }
 
@@ -209,6 +243,10 @@ function getRecommendations(limit = 20) {
 
 // Router
 function setRoute(route) {
+  // Route guard for unauthenticated users
+  if (!state.me && route !== "auth" && route !== "onboarding") {
+    route = "auth";
+  }
   for (const btn of document.querySelectorAll('.tab-btn')) {
     btn.classList.toggle('active', btn.dataset.route === route);
   }
@@ -217,6 +255,7 @@ function setRoute(route) {
   else if (route === "search") renderSearch();
   else if (route === "chat") renderChat();
   else if (route === "profile") renderProfile();
+  else if (route === "auth") renderAuth();
 }
 
 function bindTabs() {
@@ -292,6 +331,7 @@ function renderOnboarding() {
     const favorites = Array.from(document.getElementById('gym-select').selectedOptions).map(o=>o.value);
     const bio = document.getElementById('bio').value.trim();
     state.me = { ...state.me, name, level, goal, favorites, bio };
+    syncAccountWithMe();
     saveState();
     showToast('Profil enregistré');
     setRoute('home');
@@ -738,12 +778,23 @@ function renderProfile() {
           <input id="me-name" class="input" value="${me.name}" />
         </div>
         <div>
+          <label>Photo de profil</label>
+          <div class="grid cols-2">
+            <input type="file" id="me-photo-file" accept="image/*" />
+            <div class="row" style="gap:8px">
+              <input id="me-photo-url" class="input" placeholder="URL de la photo" />
+              <button id="apply-photo-url" class="btn">Appliquer</button>
+            </div>
+          </div>
+        </div>
+        <div>
           <label>Bio</label>
           <textarea id="me-bio" rows="4" class="input">${me.bio ?? ''}</textarea>
         </div>
         <div class="row" style="gap:8px">
           <button id="save-me" class="btn primary">Enregistrer</button>
           <button id="reset" class="btn">Réinitialiser</button>
+          <button id="logout" class="btn">Déconnexion</button>
         </div>
       </div>
     </div>
@@ -751,11 +802,30 @@ function renderProfile() {
   document.getElementById('save-me').onclick = () => {
     state.me.name = document.getElementById('me-name').value.trim() || state.me.name;
     state.me.bio = document.getElementById('me-bio').value.trim();
-    saveState(); showToast('Profil mis à jour');
+    syncAccountWithMe(); saveState(); showToast('Profil mis à jour');
   };
   document.getElementById('reset').onclick = () => {
     localStorage.removeItem(STORAGE_KEY); state = seed(); saveState(); setRoute('home'); showToast('Réinitialisé');
   };
+  document.getElementById('logout').onclick = () => {
+    state.me = null; state.auth = { currentUserId: null }; saveState(); setRoute('auth');
+  };
+  const fileInput = document.getElementById('me-photo-file');
+  fileInput?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.me.photoUrl = String(reader.result);
+      syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour');
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('apply-photo-url')?.addEventListener('click', () => {
+    const url = document.getElementById('me-photo-url').value.trim();
+    if (!url) return;
+    state.me.photoUrl = url; syncAccountWithMe(); saveState(); renderProfile(); showToast('Photo mise à jour');
+  });
 }
 
 function proposeSession(partner, gymId, start) {
@@ -774,7 +844,93 @@ function proposeSession(partner, gymId, start) {
 // Initial render and bindings
 function init() {
   bindTabs();
-  if (!state.me) renderOnboarding(); else setRoute('home');
+  if (state.auth?.currentUserId && !state.me) setLoggedInUserById(state.auth.currentUserId);
+  if (!state.me) setRoute('auth'); else setRoute('home');
 }
 
 window.addEventListener('DOMContentLoaded', init);
+
+// Auth view
+function renderAuth() {
+  viewRoot().innerHTML = `
+    <div class="section h1">Compte</div>
+    <div class="card">
+      <div class="row" style="gap:8px; margin-bottom:10px">
+        <button class="btn chip" id="tab-login">Connexion</button>
+        <button class="btn chip" id="tab-signup">Inscription</button>
+      </div>
+      <div id="auth-forms" class="grid">
+        <div id="login-form" class="grid">
+          <div>
+            <label>Email</label>
+            <input id="login-email" class="input" type="email" placeholder="vous@example.com" />
+          </div>
+          <div>
+            <label>Mot de passe</label>
+            <input id="login-pass" class="input" type="password" placeholder="Votre mot de passe" />
+          </div>
+          <button id="btn-login" class="btn primary">Se connecter</button>
+        </div>
+        <div id="signup-form" class="grid" style="display:none">
+          <div>
+            <label>Prénom</label>
+            <input id="su-name" class="input" placeholder="Votre prénom" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="su-email" class="input" type="email" placeholder="vous@example.com" />
+          </div>
+          <div>
+            <label>Mot de passe</label>
+            <input id="su-pass" class="input" type="password" placeholder="Mot de passe" />
+          </div>
+          <button id="btn-signup" class="btn success">Créer un compte</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const loginTab = document.getElementById('tab-login');
+  const signupTab = document.getElementById('tab-signup');
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const showLogin = () => { loginForm.style.display = 'grid'; signupForm.style.display = 'none'; };
+  const showSignup = () => { loginForm.style.display = 'none'; signupForm.style.display = 'grid'; };
+  loginTab.onclick = showLogin; signupTab.onclick = showSignup;
+  showLogin();
+
+  document.getElementById('btn-login').onclick = () => {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const pass = document.getElementById('login-pass').value;
+    const acct = state.accounts.find(a => (a.email||'').toLowerCase() === email && a.password === pass);
+    if (!acct) { showToast('Identifiants invalides'); return; }
+    setLoggedInUserById(acct.id);
+    showToast('Connecté');
+    setRoute('home');
+  };
+  document.getElementById('btn-signup').onclick = () => {
+    const name = document.getElementById('su-name').value.trim();
+    const email = document.getElementById('su-email').value.trim().toLowerCase();
+    const pass = document.getElementById('su-pass').value;
+    if (!name || !email || !pass) { showToast('Complétez tous les champs'); return; }
+    if (state.accounts.some(a => (a.email||'').toLowerCase() === email)) { showToast('Email déjà utilisé'); return; }
+    const id = `acc_${Date.now()}`;
+    const account = {
+      id,
+      name,
+      email,
+      password: pass,
+      photoUrl: avatar(name),
+      level: 1,
+      goal: 'Hypertrophie',
+      favorites: [state.gyms[0]?.id].filter(Boolean),
+      availabilityMask: generateRandomWeekMask(0.3),
+      bio: '',
+    };
+    state.accounts.push(account);
+    state.me = { ...account };
+    state.auth = { currentUserId: id };
+    saveState();
+    showToast('Compte créé');
+    setRoute('onboarding');
+  };
+}
