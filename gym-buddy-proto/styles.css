@@ -88,7 +88,7 @@ label { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 6
 
 /* Matching cards */
 .match-card { position: relative; overflow: hidden; }
-.match-photo { width: 100%; height: 260px; object-fit: cover; border-radius: 10px; -webkit-user-drag: none; user-select: none; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+.match-photo { width: 100%; height: 260px; object-fit: cover; border-radius: 10px; -webkit-user-drag: none; user-select: none; pointer-events: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
 

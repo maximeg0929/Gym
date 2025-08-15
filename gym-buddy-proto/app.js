@@ -628,13 +628,22 @@ function renderHome() {
   const container = document.getElementById('match-container');
   if (listMode) {
     container.innerHTML = renderList(recos);
+    // Bind list actions (home)
     container.querySelectorAll('[data-like]').forEach(btn => btn.addEventListener('click', () => {
       const uid = btn.getAttribute('data-like');
       state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: uid, decision: 'like', createdAt: Date.now() });
       if (Math.random() < 0.25) { state.matches.push({ id: `m_${Date.now()}`, userA: state.me.id, userB: uid, createdAt: Date.now(), active: true }); ensureChatForMatch(uid); showToast('Nouveau match !'); } else { showToast('Like envoyé'); }
-      saveState(); renderHome();
+      saveState();
+      renderHome();
     }));
-    container.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => { const uid = btn.getAttribute('data-detail'); openProfileModal(state.users.find(u=>u.id===uid)); }));
+    container.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => {
+      const uid = btn.getAttribute('data-detail');
+      openProfileModal(state.users.find(u=>u.id===uid));
+    }));
+    container.querySelectorAll('[data-open-profile]').forEach(img => img.addEventListener('click', () => {
+      const uid = img.getAttribute('data-open-profile');
+      openProfileModal(state.users.find(u=>u.id===uid));
+    }));
   } else {
     const deck = document.createElement('div'); deck.className = 'card swipe-deck'; container.appendChild(deck); renderSwipeDeckInto(deck, recos);
   }
@@ -648,9 +657,11 @@ function renderSwipeDeckInto(root, recos) {
     const r = recos[index];
     const el = document.createElement('div'); el.className = 'swipe-card'; el.innerHTML = matchCardHTML(r.user, r.score); root.appendChild(el);
     const like = el.querySelector('[data-like]'); const pass = el.querySelector('[data-pass]'); const detail = el.querySelector('[data-detail]');
+    const photo = el.querySelector('.match-photo');
     like.addEventListener('click', () => onSwipe(r.user, 'like'));
     pass.addEventListener('click', () => onSwipe(r.user, 'pass'));
     detail.addEventListener('click', () => openProfileModal(r.user));
+    photo?.addEventListener('click', () => openProfileModal(r.user));
     let startX = 0, startY = 0, dragging = false; let currentX = 0, currentY = 0;
     const onPointerDown = (e) => { dragging = true; el.classList.add('dragging'); startX = (e.touches ? e.touches[0].clientX : e.clientX); startY = (e.touches ? e.touches[0].clientY : e.clientY); };
     const onPointerMove = (e) => { if (!dragging) return; const x = (e.touches ? e.touches[0].clientX : e.clientX); const y = (e.touches ? e.touches[0].clientY : e.clientY); currentX = x - startX; currentY = y - startY; const rot = currentX / 20; const opacity = Math.max(0.6, 1 - Math.abs(currentX) / 600); el.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rot}deg)`; el.style.opacity = String(opacity); };
@@ -671,7 +682,7 @@ function renderList(recos) {
     <div class="card list">
       ${recos.map(r => `
         <div class="item">
-          <img class="avatar" src="${r.user.photoUrl}" alt="${r.user.name}" />
+          <img class="avatar" src="${r.user.photoUrl}" alt="${r.user.name}" data-open-profile="${r.user.id}" />
           <div>
             <div class="row space-between">
               <div style="font-weight:700">${r.user.name}</div>
@@ -842,6 +853,7 @@ function renderSearch() {
     document.getElementById('results').innerHTML = renderList(items);
     document.querySelectorAll('[data-like]').forEach(btn => btn.addEventListener('click', () => { const uid = btn.getAttribute('data-like'); state.swipes.push({ id: `s_${Date.now()}`, swiperId: state.me.id, targetId: uid, decision: 'like', createdAt: Date.now() }); saveState(); showToast('Like envoyé'); }));
     document.querySelectorAll('[data-detail]').forEach(btn => btn.addEventListener('click', () => { const uid = btn.getAttribute('data-detail'); openProfileModal(state.users.find(u=>u.id===uid)); }));
+    document.querySelectorAll('[data-open-profile]').forEach(img => img.addEventListener('click', () => { const uid = img.getAttribute('data-open-profile'); openProfileModal(state.users.find(u=>u.id===uid)); }));
   });
 }
 
@@ -873,19 +885,24 @@ function openChatRoom(matchId) {
   const partner = state.users.find(u => u.id === partnerId);
   if (!partner) return;
   if (!match.messages) match.messages = [];
+
   document.getElementById('chat-room').innerHTML = `
     <div class="card">
       <div class="row space-between">
         <div class="h2" style="text-transform:none">${partner.name}</div>
         <div class="row" style="gap:8px">
+          <button class="btn" id="btn-close-chat" title="Fermer">✖️</button>
           <button class="btn" id="btn-plan">Planifier séance</button>
         </div>
       </div>
       <div class="messages" id="msgs">
-        ${match.messages.map(m => `
+        ${match.messages.map((m, idx) => `
           <div class="msg ${m.senderId===state.me.id?'self':'other'}">
             <div>${m.text}</div>
-            <div class="meta">${new Date(m.createdAt).toLocaleString()}</div>
+            <div class="meta">${new Date(m.createdAt).toLocaleString()} ${renderReactions(m)}</div>
+            <div class="row" style="gap:6px; margin-top:4px">
+              ${renderReactionButtons(idx)}
+            </div>
           </div>
         `).join('')}
       </div>
@@ -898,10 +915,31 @@ function openChatRoom(matchId) {
   const msgs = document.getElementById('msgs');
   document.getElementById('send-msg').onclick = () => {
     const text = document.getElementById('msg-input').value.trim(); if (!text) return;
-    match.messages.push({ id: `msg_${Date.now()}`, chatId: match.id, senderId: state.me.id, text, type: 'text', createdAt: Date.now() });
+    match.messages.push({ id: `msg_${Date.now()}`, chatId: match.id, senderId: state.me.id, text, type: 'text', createdAt: Date.now(), reactions: {} });
     saveState(); openChatRoom(matchId); setTimeout(()=> msgs.scrollTop = msgs.scrollHeight, 0);
   };
   document.getElementById('btn-plan').onclick = () => openPlanner(partner);
+  document.getElementById('btn-close-chat').onclick = () => { document.getElementById('chat-room').innerHTML = ''; };
+  // Bind reaction buttons
+  msgs.querySelectorAll('[data-react]').forEach(btn => btn.addEventListener('click', () => {
+    const reaction = btn.getAttribute('data-react');
+    const idx = parseInt(btn.getAttribute('data-msg-idx'));
+    const m = match.messages[idx];
+    if (!m.reactions) m.reactions = {};
+    const key = `${reaction}`;
+    m.reactions[key] = (m.reactions[key] || 0) + 1;
+    saveState(); openChatRoom(matchId);
+  }));
+}
+function renderReactions(message) {
+  const r = message.reactions || {};
+  const entries = Object.entries(r);
+  if (!entries.length) return '';
+  return entries.map(([k,v]) => `${k} ${v}`).join(' ');
+}
+function renderReactionButtons(msgIdx) {
+  const emojis = ['👍','💪','🔥','😊','👏'];
+  return emojis.map((e) => `<button class="btn chip" data-react="${e}" data-msg-idx="${msgIdx}" style="padding:4px 8px">${e}</button>`).join('');
 }
 
 function openPlanner(partner) {
