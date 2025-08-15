@@ -149,3 +149,10 @@ label { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 6
 .row > .input, .row > input.input, .row > textarea, .row > select { flex: 1; min-width: 0; }
 .grid.cols-2, .grid.cols-3 { align-items: start; }
 select[multiple] { max-height: 240px; overflow: auto; }
+
+/* Profile action buttons layout */
+.profile-actions { flex-wrap: wrap; }
+.profile-actions .btn { flex: 1 1 auto; min-width: 120px; }
+@media (max-width: 360px) {
+  .profile-actions .btn { min-width: 100%; }
+}

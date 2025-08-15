@@ -1067,7 +1067,7 @@ function renderProfile() {
           <label>Bio</label>
           <textarea id="me-bio" rows="4" class="input">${me.bio ?? ''}</textarea>
         </div>
-        <div class="row" style="gap:8px">
+        <div class="row profile-actions" style="gap:8px">
           <button id="save-me" class="btn primary" style="display:${edit ? 'inline-block':'none'}">Enregistrer</button>
           <button id="reset" class="btn">Réinitialiser</button>
           <button id="logout" class="btn">Déconnexion</button>
