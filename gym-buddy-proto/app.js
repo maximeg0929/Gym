@@ -1033,7 +1033,7 @@ function renderProfile() {
           <label>Photo de profil</label>
           <div class="grid cols-2" style="display:${edit ? 'grid' : 'none'}">
             <input type="file" id="me-photo-file" accept="image/*" />
-            <div class="row" style="gap:8px">
+            <div class="row profile-inline-controls" style="gap:8px">
               <input id="me-photo-url" class="input" placeholder="URL de la photo" />
               <button id="apply-photo-url" class="btn">Appliquer</button>
             </div>

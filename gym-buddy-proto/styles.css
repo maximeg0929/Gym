@@ -156,3 +156,12 @@ select[multiple] { max-height: 240px; overflow: auto; }
 @media (max-width: 360px) {
   .profile-actions .btn { min-width: 100%; }
 }
+
+/* Inline controls wrapping for edit sections */
+.profile-inline-controls { flex-wrap: wrap; }
+.profile-inline-controls .input { flex: 1 1 200px; min-width: 160px; }
+.profile-inline-controls .btn { flex: 0 0 auto; }
+@media (max-width: 380px) {
+  .profile-inline-controls .input { min-width: 100%; }
+  .profile-inline-controls .btn { width: 100%; }
+}
