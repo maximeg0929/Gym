@@ -93,7 +93,7 @@ label { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 6
 .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
 
 /* Swipe overlay */
-.swipe-deck { position: relative; height: 440px; }
+.swipe-deck { position: relative; height: 64vh; margin-top: 8px; }
 .swipe-card { position: absolute; inset: 0; transition: transform 0.2s ease, opacity 0.2s ease; cursor: grab; user-select: none; touch-action: pan-y; }
 .swipe-card.dragging { cursor: grabbing; }
 .swipe-badge { position: absolute; top: 14px; padding: 8px 12px; font-weight: 900; letter-spacing: 0.08em; border-radius: 10px; border: 2px solid; opacity: 0; transform: scale(0.95) rotate(-8deg); transition: opacity 0.15s ease, transform 0.15s ease; }
@@ -137,7 +137,8 @@ label { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 6
   .btn { padding: 12px 14px; border-radius: 12px; }
   .grid.cols-2 { grid-template-columns: 1fr; }
   .grid.cols-3 { grid-template-columns: 1fr; }
-  .match-photo { height: 220px; }
+  .swipe-deck { height: 78vh; margin-top: 12px; }
+  .match-photo { height: 60vh; }
   .messages { height: 300px; }
   .bottom-nav .tab-btn { font-size: 24px; padding: 12px 0; }
 }
