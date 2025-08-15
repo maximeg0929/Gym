@@ -144,3 +144,8 @@ label { font-weight: 600; font-size: 13px; color: var(--muted); margin-bottom: 6
   .messages { height: 300px; }
   .bottom-nav .tab-btn { font-size: 24px; padding: 12px 0; }
 }
+
+/* Layout fixes for profile fields */
+.row > .input, .row > input.input, .row > textarea, .row > select { flex: 1; min-width: 0; }
+.grid.cols-2, .grid.cols-3 { align-items: start; }
+select[multiple] { max-height: 240px; overflow: auto; }
