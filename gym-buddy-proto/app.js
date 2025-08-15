@@ -993,7 +993,7 @@ function renderProfile() {
         </div>
         <div>
           <label>Photo de profil</label>
-          <div class="grid cols-2">
+          <div class="grid cols-2" style="display:${edit ? 'grid' : 'none'}">
             <input type="file" id="me-photo-file" accept="image/*" />
             <div class="row" style="gap:8px">
               <input id="me-photo-url" class="input" placeholder="URL de la photo" />
@@ -1005,16 +1005,16 @@ function renderProfile() {
           <label>Localisation</label>
           <div class="grid cols-2">
             <div>
-              <input id="me-region-search" class="input" placeholder="Rechercher une région" />
+              <input id="me-region-search" class="input" placeholder="Rechercher une région" style="display:${edit ? 'block' : 'none'}" />
               <select id="me-region" class="input"></select>
             </div>
             <div>
-              <input id="me-dept-search" class="input" placeholder="Rechercher un département" />
+              <input id="me-dept-search" class="input" placeholder="Rechercher un département" style="display:${edit ? 'block' : 'none'}" />
               <select id="me-dept" class="input"></select>
             </div>
           </div>
           <div style="margin-top:8px">
-            <input id="me-city-search" class="input" placeholder="Rechercher une ville" />
+            <input id="me-city-search" class="input" placeholder="Rechercher une ville" style="display:${edit ? 'block' : 'none'}" />
             <select id="me-city" class="input"></select>
           </div>
         </div>
